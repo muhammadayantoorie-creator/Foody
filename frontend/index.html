@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zomato Clone | Food Delivery</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header>
+    <div class="container navbar">
+      <div class="logo" id="nav-logo" style="cursor:pointer;">zomato</div>
+      <div class="nav-actions">
+        <button class="user-btn"><i class="far fa-user"></i></button>
+        <button class="cart-btn" id="cart-btn">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-badge" id="cart-badge" style="display:none;">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HOME PAGE -->
+  <div id="home-page" class="page active">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container" style="display:flex; flex-direction:column; align-items:center;">
+        <h1>Discover the best food & drinks</h1>
+        <p>Order food from favourite restaurants near you.</p>
+        <div class="search-container">
+          <div class="location-selector">
+            <i class="fas fa-map-marker-alt"></i>
+            <select id="city-selector" style="border:none; outline:none; background:transparent; font-weight:bold; color:var(--text-dark); cursor:pointer; font-size: 1rem;">
+              <option value="Lahore">Lahore</option>
+              <option value="Karachi">Karachi</option>
+              <option value="Islamabad">Islamabad</option>
+              <option value="Rawalpindi">Rawalpindi</option>
+              <option value="Faisalabad">Faisalabad</option>
+              <option value="Multan">Multan</option>
+              <option value="Peshawar">Peshawar</option>
+              <option value="Quetta">Quetta</option>
+            </select>
+          </div>
+          <input type="text" id="search-input" class="search-input" placeholder="Search for restaurant, cuisine or a dish">
+          <button class="search-btn">Search</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- Categories -->
+      <section class="categories-section">
+        <h2>Inspiration for your first order</h2>
+        <div class="categories-grid" id="categories-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Offers -->
+      <section class="offers-section">
+        <div class="offers-grid" id="offers-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- Restaurants -->
+      <section class="restaurants-section">
+        <h2 id="delivery-title">Delivery Restaurants in Lahore</h2>
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="rating">Rating: 4.0+</button>
+          <button class="filter-btn" data-filter="delivery">Fast Delivery</button>
+          <button class="filter-btn" data-filter="cost-lh">Cost: Low to High</button>
+        </div>
+        
+        <div class="restaurant-grid" id="restaurant-grid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- RESTAURANT DETAIL PAGE -->
+  <div id="restaurant-page" class="page">
+    <div class="container" style="padding-top: 30px;">
+      <button onclick="navigateTo('home')" style="margin-bottom:20px; font-weight:600; font-size:1.1rem; color:var(--text-light);"><i class="fas fa-arrow-left"></i> Back</button>
+      
+      <img id="detail-cover" class="detail-cover" src="" alt="Cover">
+      
+      <div class="detail-header">
+        <div>
+          <h1 id="detail-title" class="detail-title">Restaurant Name</h1>
+          <div id="detail-tags" class="detail-tags">Cuisine Tags</div>
+        </div>
+        <div id="detail-meta">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <!-- Sidebar -->
+        <div class="menu-sidebar">
+          <div class="menu-nav" id="menu-nav">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="menu-content" id="menu-content">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKING PAGE -->
+  <div id="tracking-page" class="page">
+    <div class="container">
+      <div class="tracking-container">
+        <h2>Order Placed Successfully!</h2>
+        <p style="color:var(--text-light); margin-bottom: 30px;">Your food is being prepared.</p>
+        
+        <div class="eta-box">
+          <div style="color:var(--text-light); font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Estimated Delivery</div>
+          <div class="eta-time">25 Min</div>
+        </div>
+
+        <div class="progress-track" id="progress-track">
+          <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+          <div class="step active">
+            <div class="step-icon"><i class="fas fa-check"></i></div>
+            <span>Placed</span>
+          </div>
+          <div class="step">
+            <div class="step-icon"><i class="fas fa-fire"></i></div>
+            <span>Preparing</span>
+          </div>
+          <div class="step">
+            <div class="step-icon"><i class="fas fa-motorcycle"></i></div>
+            <span>On the way</span>
+          </div>
+          <div class="step">
+            <div class="step-icon"><i class="fas fa-home"></i></div>
+            <span>Delivered</span>
+          </div>
+        </div>
+        
+        <button class="search-btn" onclick="navigateTo('home')" style="margin-top: 30px;">Back to Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CART OVERLAY -->
+  <div class="modal-overlay" id="cart-overlay">
+    <div class="cart-sidebar">
+      <div class="cart-header">
+        <h2>Your Cart</h2>
+        <button class="close-cart" id="close-cart"><i class="fas fa-times"></i></button>
+      </div>
+      
+      <div class="cart-body">
+        <div class="empty-cart" id="empty-cart-state">
+          <i class="fas fa-shopping-bag"></i>
+          <h3>Cart is empty</h3>
+          <p>Add some items from the menu to get started.</p>
+        </div>
+
+        <div class="cart-items" id="cart-items-container">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="bill-details" id="bill-details" style="display:none;">
+          <div class="bill-row">
+            <span>Item Total</span>
+            <span id="bill-subtotal">Rs. 0</span>
+          </div>
+          <div class="bill-row">
+            <span>Delivery Fee</span>
+            <span id="bill-delivery">Rs. 0</span>
+          </div>
+          <div class="bill-row">
+            <span>Taxes (5%)</span>
+            <span id="bill-tax">Rs. 0</span>
+          </div>
+          <div class="bill-row" style="color:var(--success); display:none;">
+            <span>Discount Applied</span>
+            <span id="bill-discount">-Rs. 0</span>
+          </div>
+          <div class="bill-row total">
+            <span>To Pay</span>
+            <span id="cart-total">Rs. 0</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cart-footer">
+        <button class="checkout-btn" id="checkout-btn" style="display:none;">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
