@@ -52,6 +52,10 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Force new SW to take over immediately — clears stale cached bundles
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         // Cache pages and assets for offline use
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
@@ -60,7 +64,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'google-fonts-cache',
+              cacheName: 'google-fonts-cache-v2',
               expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
               cacheableResponse: { statuses: [0, 200] },
             },
@@ -70,7 +74,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'gstatic-fonts-cache',
+              cacheName: 'gstatic-fonts-cache-v2',
               expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
               cacheableResponse: { statuses: [0, 200] },
             },
@@ -80,7 +84,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'supabase-images-cache',
+              cacheName: 'supabase-images-cache-v2',
               expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 7 },
               cacheableResponse: { statuses: [0, 200] },
             },
@@ -88,7 +92,7 @@ export default defineConfig({
         ],
       },
       devOptions: {
-        enabled: true, // enable PWA in dev mode for testing
+        enabled: false, // Disabled in dev — prevents stale caches from PWA
       },
     }),
   ],

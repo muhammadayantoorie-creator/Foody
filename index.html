@@ -41,6 +41,22 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Cache buster: clears stale PWA caches that may serve old JS bundles -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        // Unregister all old service workers and clear all caches
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (let registration of registrations) {
+            registration.unregister();
+          }
+        });
+        caches.keys().then(function(cacheNames) {
+          cacheNames.forEach(function(cacheName) {
+            caches.delete(cacheName);
+          });
+        });
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
