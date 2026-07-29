@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/logo.png" alt="FoodDash Enterprise Logo" width="180" style="border-radius: 24px; box-shadow: 0 12px 32px rgba(226, 55, 68, 0.4);" />
+</p>
+
 # 🍔 FoodDash Enterprise — Next-Gen 3D Food Delivery Platform
 
 [![React](https://img.shields.io/badge/React-18.x-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
@@ -9,6 +13,14 @@
 [![PWA Ready](https://img.shields.io/badge/PWA-Service_Worker-purple?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
 
 An enterprise-grade, cross-platform food ordering and restaurant management solution featuring hardware-accelerated **3D WebGL visuals**, interactive card physics, dual **Web + Native Desktop (Electron)** runtime environments, real-time **Supabase PostgreSQL** database sync with Row-Level Security (RLS), and a Node.js API backend for Stripe payments and Resend transactional emails.
+
+---
+
+## 📸 Application Showcase & Preview
+
+<p align="center">
+  <img src="docs/images/app_preview.png" alt="FoodDash 3D WebGL Dashboard Preview" width="100%" style="border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);" />
+</p>
 
 ---
 
