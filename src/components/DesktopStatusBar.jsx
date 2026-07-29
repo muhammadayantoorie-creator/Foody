@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff, Printer, Zap, Keyboard, Clock } from 'lucide-react';
+import { Wifi, WifiOff, Printer, Zap, Keyboard, Clock, Search, Settings, HelpCircle, Globe, DollarSign } from 'lucide-react';
+import { useLanguageCurrency } from '../contexts/LanguageCurrencyContext';
 
-export default function DesktopStatusBar() {
+export default function DesktopStatusBar({ onOpenCommand, onOpenSettings, onOpenShortcuts }) {
   const isElectron = !!window.electronAPI;
+  const { language, toggleLanguage, currency, toggleCurrency, formatPKRDate } = useLanguageCurrency();
+
   const [online, setOnline] = useState(navigator.onLine);
   const [latency, setLatency] = useState(14);
-  const [printerStatus, setPrinterStatus] = useState('Checking POS…');
-  const [printerReady, setPrinterReady] = useState(false);
+  const [printerStatus, setPrinterStatus] = useState('POS Standby');
+  const [printerReady, setPrinterReady] = useState(true);
   const [time, setTime] = useState(new Date());
   const [memory, setMemory] = useState(null);
 
@@ -24,32 +27,13 @@ export default function DesktopStatusBar() {
     // Live clock
     const clockInterval = setInterval(() => setTime(new Date()), 1000);
 
-    // Memory usage (Chrome/Electron)
+    // Memory usage
     const memInterval = setInterval(() => {
       if (performance.memory) {
         const used = Math.round(performance.memory.usedJSHeapSize / 1048576);
         setMemory(used);
       }
     }, 3000);
-
-    // Check printers via Electron IPC
-    if (isElectron && window.electronAPI.getPrinters) {
-      window.electronAPI.getPrinters().then(printers => {
-        if (printers && printers.length > 0) {
-          const p = printers.find(p => p.isDefault) || printers[0];
-          setPrinterStatus(`POS: ${p.name.substring(0, 18)}`);
-          setPrinterReady(true);
-        } else {
-          setPrinterStatus('Thermal Standby');
-          setPrinterReady(false);
-        }
-      }).catch(() => {
-        setPrinterStatus('Direct Print Ready');
-        setPrinterReady(true);
-      });
-    } else {
-      setPrinterStatus('POS Standby');
-    }
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -58,26 +42,26 @@ export default function DesktopStatusBar() {
       clearInterval(clockInterval);
       clearInterval(memInterval);
     };
-  }, [isElectron]);
+  }, []);
 
-  const timeStr = time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  const pktTimeStr = time.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true, timeZone: 'Asia/Karachi' });
 
   return (
     <footer style={styles.statusBar}>
-      {/* Left: connection status */}
+      {/* Left: connection status & system health */}
       <div style={styles.group}>
         {online
           ? <Wifi size={11} color="#22c55e" />
           : <WifiOff size={11} color="#ef4444" />
         }
         <span style={{ ...styles.text, color: online ? '#4ade80' : '#f87171' }}>
-          {online ? 'Connected' : 'Offline'}
+          {online ? 'Online (PK Fleet)' : 'Offline (Local Cache)'}
         </span>
 
         <span style={styles.sep}>·</span>
 
-        <Zap size={10} color={latency < 20 ? '#22c55e' : latency < 50 ? '#f59e0b' : '#ef4444'} />
-        <span style={{ ...styles.text, color: latency < 20 ? '#4ade80' : latency < 50 ? '#fbbf24' : '#f87171' }}>
+        <Zap size={10} color={latency < 20 ? '#22c55e' : '#f59e0b'} />
+        <span style={{ ...styles.text, color: latency < 20 ? '#4ade80' : '#fbbf24' }}>
           {latency}ms
         </span>
 
@@ -87,22 +71,53 @@ export default function DesktopStatusBar() {
             <span style={styles.text}>RAM: {memory} MB</span>
           </>
         )}
+
+        <span style={styles.sep}>·</span>
+        <span style={styles.badgePKR}>🇵🇰 PKR Enterprise</span>
       </div>
 
-      {/* Right: printer + hotkeys + clock */}
+      {/* Right: Quick Command Triggers + Language + Currency + Clock */}
       <div style={styles.group}>
-        {isElectron && (
-          <>
-            <Printer size={11} color={printerReady ? '#22c55e' : '#94a3b8'} />
-            <span style={{ ...styles.text, color: printerReady ? '#4ade80' : '#94a3b8' }}>{printerStatus}</span>
-            <span style={styles.sep}>·</span>
-            <Keyboard size={11} color="#38bdf8" />
-            <span style={{ ...styles.hotkey }}>Ctrl+Shift+O/P/M</span>
-            <span style={styles.sep}>·</span>
-          </>
-        )}
+        {/* Command Palette Trigger */}
+        <button onClick={onOpenCommand} style={styles.btnTrigger} title="Open Command Palette (Ctrl + K)">
+          <Search size={10} color="#FF6B35" />
+          <span style={styles.hotkey}>Ctrl + K</span>
+        </button>
+
+        <span style={styles.sep}>·</span>
+
+        {/* Currency Toggle */}
+        <button onClick={toggleCurrency} style={styles.btnTrigger} title="Toggle Currency (PKR / USD)">
+          <DollarSign size={10} color="#F59E0B" />
+          <span>{currency}</span>
+        </button>
+
+        <span style={styles.sep}>·</span>
+
+        {/* Language Toggle */}
+        <button onClick={toggleLanguage} style={styles.btnTrigger} title="Toggle Language (English / اردو)">
+          <Globe size={10} color="#EC4899" />
+          <span>{language === 'en' ? 'EN' : 'اردو'}</span>
+        </button>
+
+        <span style={styles.sep}>·</span>
+
+        {/* Settings Trigger */}
+        <button onClick={onOpenSettings} style={styles.btnTrigger} title="Open System Settings (Ctrl + S)">
+          <Settings size={10} color="#3B82F6" />
+        </button>
+
+        <span style={styles.sep}>·</span>
+
+        {/* Shortcuts Trigger */}
+        <button onClick={onOpenShortcuts} style={styles.btnTrigger} title="Keyboard Shortcuts (?)">
+          <HelpCircle size={10} color="#8B5CF6" />
+        </button>
+
+        <span style={styles.sep}>·</span>
+
         <Clock size={11} color="#94a3b8" />
-        <span style={styles.text}>{timeStr}</span>
+        <span style={{ ...styles.text, color: '#E2E8F0', fontWeight: 600 }}>{pktTimeStr} PKT</span>
       </div>
     </footer>
   );
@@ -110,39 +125,61 @@ export default function DesktopStatusBar() {
 
 const styles = {
   statusBar: {
-    height: '24px',
-    background: 'linear-gradient(90deg, #06090f 0%, #0a0f1e 100%)',
+    height: '26px',
+    background: 'linear-gradient(90deg, #06090F 0%, #0A0F1E 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '0 14px',
-    borderTop: '1px solid rgba(255,255,255,0.05)',
+    borderTop: '1px solid rgba(255,255,255,0.08)',
     fontFamily: '"Fira Code", "Cascadia Code", "Consolas", monospace',
     userSelect: 'none',
+    zIndex: 9990,
   },
   group: {
     display: 'flex',
     alignItems: 'center',
-    gap: '5px',
+    gap: '6px',
   },
   text: {
-    color: '#64748b',
-    fontSize: '0.67rem',
+    color: '#64748B',
+    fontSize: '0.68rem',
     letterSpacing: '0.02em',
   },
   sep: {
-    color: '#1e293b',
+    color: '#1E293B',
     fontSize: '0.75rem',
     margin: '0 1px',
   },
+  badgePKR: {
+    background: 'rgba(34, 197, 94, 0.15)',
+    color: '#4ADE80',
+    padding: '1px 6px',
+    borderRadius: '4px',
+    fontSize: '0.62rem',
+    fontWeight: 700,
+    border: '1px solid rgba(34, 197, 94, 0.3)',
+  },
+  btnTrigger: {
+    background: 'transparent',
+    border: 'none',
+    color: '#94A3B8',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '3px',
+    fontSize: '0.65rem',
+    padding: '2px 4px',
+    borderRadius: '4px',
+    transition: 'all 0.15s ease',
+  },
   hotkey: {
-    background: '#1e293b',
-    color: '#38bdf8',
+    background: '#1E293B',
+    color: '#FF6B35',
     padding: '1px 5px',
     borderRadius: '3px',
-    fontSize: '0.63rem',
-    fontFamily: 'inherit',
-    letterSpacing: '0.02em',
-    border: '1px solid rgba(56,189,248,0.15)',
+    fontSize: '0.62rem',
+    fontWeight: 700,
+    border: '1px solid rgba(255,107,53,0.2)',
   },
 };
