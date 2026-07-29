@@ -5,6 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { SectionSpinner, ErrorBanner } from '../components/LoadingSpinner';
 import { useIsMobile } from '../hooks/useIsMobile';
+import Food3DHeroCanvas from '../components/Food3DHeroCanvas';
+import TiltCard from '../components/TiltCard';
+import { Search, Sparkles, MapPin, Star, Flame, SlidersHorizontal, Filter, ShieldCheck } from 'lucide-react';
 
 const CATEGORIES = [
   { name: 'All', icon: '🍽️' },
@@ -121,7 +124,7 @@ export default function Dashboard() {
   const cartCount = getCartCount();
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--background)', fontFamily: 'var(--font-body)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--background)', fontFamily: 'var(--font-body)' }} className="page-enter">
       {/* ─── Sticky Navbar ─── */}
       <nav style={{
         ...styles.nav,
@@ -129,57 +132,83 @@ export default function Dashboard() {
       }}>
         <div style={styles.navInner}>
           <div style={styles.navLeft} onClick={() => navigate('/dashboard')}>
-            <span style={styles.brandIcon}>🍕</span>
+            <div style={{
+              width: '38px', height: '38px',
+              background: 'linear-gradient(135deg, #e23744, #ff6b35)',
+              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: scrolled ? '0 4px 12px rgba(226,55,68,0.4)' : '0 4px 16px rgba(226,55,68,0.6)',
+              transition: 'all 0.3s', flexShrink: 0,
+            }}>
+              <span style={{ fontSize: '1.2rem' }}>🍔</span>
+            </div>
             <h1 style={{ ...styles.brandName, color: scrolled ? 'var(--primary)' : '#ffffff' }}>FoodDash</h1>
+            <span style={{
+              fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.07em',
+              background: scrolled ? 'linear-gradient(135deg,#6366f1,#a855f7)' : 'rgba(255,255,255,0.2)',
+              color: '#fff', padding: '2px 7px', borderRadius: '4px', textTransform: 'uppercase',
+              backdropFilter: 'blur(8px)',
+            }}>Enterprise</span>
           </div>
 
           <div style={styles.navRight}>
+            {/* Live indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: scrolled ? '#f0fdf4' : 'rgba(34,197,94,0.15)', borderRadius: '20px', border: `1px solid ${scrolled ? '#bbf7d0' : 'rgba(34,197,94,0.3)'}` }} className="hide-mobile">
+              <span className="status-dot-live" />
+              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: scrolled ? '#15803d' : '#4ade80' }}>LIVE</span>
+            </div>
+
             <button
               onClick={() => navigate('/my-orders')}
-              style={{ ...styles.navBtn, color: scrolled ? 'var(--text-secondary)' : '#ffffff' }}
+              style={{ ...styles.navBtn, color: scrolled ? 'var(--text-secondary)' : 'rgba(255,255,255,0.9)', background: scrolled ? '#f8fafc' : 'rgba(255,255,255,0.12)', border: `1px solid ${scrolled ? '#e2e8f0' : 'rgba(255,255,255,0.2)'}`, borderRadius: '10px', padding: '0.45rem 0.9rem' }}
             >
               📦 <span className="hide-mobile">My Orders</span>
             </button>
-            
-            <button onClick={toggleSidebar} style={styles.cartBtnNav}>
+
+            <button onClick={toggleSidebar} style={{ ...styles.cartBtnNav, background: 'linear-gradient(135deg, #e23744, #CB202D)', borderRadius: '12px', width: 'auto', padding: '0 14px', gap: '6px', fontSize: '0.88rem', fontWeight: 700 }}>
               🛒
               {cartCount > 0 && (
-                <span style={styles.cartBadge} className="cart-badge-pulse">{cartCount}</span>
+                <span style={{ ...styles.cartBadge, position: 'relative', top: 'unset', right: 'unset', background: 'rgba(255,255,255,0.25)', border: 'none' }}>{cartCount}</span>
               )}
+              <span className="hide-mobile">Cart</span>
             </button>
 
-            <div style={styles.userPill}>
-              <div style={styles.avatar}>{user?.email?.[0]?.toUpperCase()}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '4px 8px 4px 4px', background: scrolled ? '#f8fafc' : 'rgba(255,255,255,0.12)', borderRadius: '12px', border: `1px solid ${scrolled ? '#e2e8f0' : 'rgba(255,255,255,0.2)'}` }}>
+              <div style={{ ...styles.avatar, boxShadow: 'none' }}>{user?.email?.[0]?.toUpperCase()}</div>
               <button
                 onClick={handleLogout}
-                style={{ ...styles.logoutBtn, color: scrolled ? 'var(--text-secondary)' : 'rgba(255,255,255,0.85)' }}
+                style={{ ...styles.logoutBtn, color: scrolled ? 'var(--text-secondary)' : 'rgba(255,255,255,0.85)', fontSize: '0.82rem' }}
               >
-                Logout
+                Sign out
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* ─── Hero Section ─── */}
-      <header style={styles.heroBanner} ref={headerRef}>
+      {/* ─── Hero Section with 3D WebGL Canvas ─── */}
+      <header style={{ ...styles.heroBanner, position: 'relative', overflow: 'hidden' }} ref={headerRef}>
+        <Food3DHeroCanvas />
         <div style={styles.heroOverlay} />
-        <div style={styles.heroContent}>
-          <h2 style={styles.heroTitle} className="animate-hero-text">FoodDash</h2>
+        <div style={{ ...styles.heroContent, position: 'relative', zIndex: 10 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)', borderRadius: '20px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.25)' }}>
+            <Sparkles size={16} color="#F5A623" />
+            <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>FUTURISTIC 3D DINING</span>
+          </div>
+          <h2 style={styles.heroTitle} className="animate-hero-text">FoodDash Enterprise</h2>
           <p style={styles.heroSubtitle} className="animate-fade-up stagger-1">
-            Discover the best food & drinks in your city
+            Discover culinary excellence with real-time 3D experience
           </p>
           
           {/* Search Container */}
           <div style={m ? styles.searchContainerMobile : styles.searchContainer} className="zomato-search animate-fade-up stagger-2">
             <div style={styles.searchLocSection}>
-              <span style={styles.searchLocIcon}>📍</span>
+              <MapPin size={18} color="var(--primary)" />
               <span style={styles.locText}>Delhi NCR</span>
               <span style={styles.locChevron}>▾</span>
             </div>
             <div style={styles.searchDivider} />
             <div style={styles.searchInputSection}>
-              <span style={styles.searchIcon}>🔍</span>
+              <Search size={18} color="var(--text-muted)" />
               <input
                 type="text"
                 placeholder="Search for restaurant, cuisine or a dish..."
@@ -198,14 +227,17 @@ export default function Dashboard() {
           {PROMOS.map((p, i) => (
             <div
               key={i}
-              style={{ ...styles.promoCard, background: p.bg }}
-              className={`promo-shine animate-fade-up stagger-${i + 1}`}
+              style={{ ...styles.promoCard, background: p.bg, boxShadow: '0 12px 32px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.15)' }}
+              className={`promo-shine hover-lift-premium animate-fade-up stagger-${i + 1}`}
             >
               <div>
                 <p style={styles.promoTitle}>{p.title}</p>
                 <p style={styles.promoSub}>{p.subtitle}</p>
+                <div style={{ marginTop: '0.6rem', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', borderRadius: '20px', padding: '3px 10px' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>Claim Now →</span>
+                </div>
               </div>
-              <span style={styles.promoIcon}>{p.icon}</span>
+              <span style={{ ...styles.promoIcon, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }}>{p.icon}</span>
             </div>
           ))}
         </div>
@@ -349,7 +381,7 @@ export default function Dashboard() {
         ) : (
           <div style={m ? styles.gridMobile : styles.grid}>
             {filtered.map((r, i) => (
-              <div
+              <TiltCard
                 key={r.id}
                 style={styles.card}
                 className={`card-premium animate-fade-up stagger-${Math.min(i + 1, 6)}`}
@@ -412,12 +444,12 @@ export default function Dashboard() {
                   
                   <div style={styles.cardFooterText}>
                     <span style={styles.safeIcon}>
-                      <span style={{ color: '#1ba672', fontSize: '0.7rem' }}>●</span>
+                      <ShieldCheck size={14} color="#1ba672" />
                     </span>
                     <span>Follows all Max Safety guidelines</span>
                   </div>
                 </div>
-              </div>
+              </TiltCard>
             ))}
 
             {filtered.length === 0 && !loadingRestaurants && (
@@ -452,15 +484,18 @@ export default function Dashboard() {
             {/* Brand Column */}
             <div>
               <div style={styles.footerBrandRow}>
-                <span style={{ fontSize: '1.8rem' }}>🍕</span>
+                <div style={{ width: '42px', height: '42px', background: 'linear-gradient(135deg, #e23744, #ff6b35)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 16px rgba(226,55,68,0.4)', flexShrink: 0 }}>
+                  <span style={{ fontSize: '1.3rem' }}>🍔</span>
+                </div>
                 <span style={styles.footerBrandName}>FoodDash</span>
+                <span style={{ fontSize: '0.58rem', fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#a855f7)', color: '#fff', padding: '2px 7px', borderRadius: '4px', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Enterprise</span>
               </div>
               <p style={styles.footerDesc}>
-                Discover the best food & drinks in your city. Fast delivery with live tracking from your favourite restaurants.
+                Discover the best food & drinks in your city. Fast delivery with live GPS tracking from your favourite restaurants.
               </p>
-              <div style={styles.socialRow}>
-                {['📘', '🐦', '📸', '🔗'].map((s, i) => (
-                  <span key={i} style={styles.socialIcon}>{s}</span>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+                {['App Store', 'Google Play'].map(s => (
+                  <div key={s} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '6px 14px', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', cursor: 'pointer' }}>{s}</div>
                 ))}
               </div>
             </div>
@@ -468,32 +503,45 @@ export default function Dashboard() {
             {/* Quick Links */}
             <div>
               <h4 style={styles.footerHeading}>Quick Links</h4>
-              {['Dashboard', 'My Orders', 'Search'].map(l => (
-                <p key={l} style={styles.footerLink}>{l}</p>
+              {['Dashboard', 'My Orders', 'Track Order', 'Search Restaurants'].map(l => (
+                <p key={l} style={styles.footerLink}>→ {l}</p>
               ))}
             </div>
 
             {/* Support */}
             <div>
               <h4 style={styles.footerHeading}>Support</h4>
-              {['Help Center', 'Contact Us', 'FAQs'].map(l => (
-                <p key={l} style={styles.footerLink}>{l}</p>
+              {['Help Center', 'Contact Us', 'FAQs', 'Report Issue'].map(l => (
+                <p key={l} style={styles.footerLink}>→ {l}</p>
               ))}
             </div>
 
             {/* Legal */}
             <div>
               <h4 style={styles.footerHeading}>Legal</h4>
-              {['Terms of Service', 'Privacy Policy', 'Cookie Policy'].map(l => (
-                <p key={l} style={styles.footerLink}>{l}</p>
+              {['Terms of Service', 'Privacy Policy', 'Cookie Policy', 'Refund Policy'].map(l => (
+                <p key={l} style={styles.footerLink}>→ {l}</p>
               ))}
             </div>
           </div>
 
-          <div style={styles.footerBottom}>
+          {/* Newsletter strip */}
+          <div style={{ margin: '2.5rem 0 2rem', padding: '1.5rem 2rem', background: 'rgba(226,55,68,0.08)', borderRadius: '16px', border: '1px solid rgba(226,55,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.05rem', marginBottom: '4px', fontFamily: 'var(--font-heading)' }}>🔔 Get exclusive offers in your inbox</div>
+              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.82rem' }}>Join 50,000+ food lovers and never miss a deal.</div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+              <input placeholder="your@email.com" style={{ padding: '0.65rem 1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: '0.88rem', outline: 'none', fontFamily: 'var(--font-body)', minWidth: '200px' }} />
+              <button style={{ padding: '0.65rem 1.2rem', background: 'linear-gradient(135deg,#e23744,#CB202D)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', boxShadow: '0 4px 14px rgba(226,55,68,0.4)', whiteSpace: 'nowrap' }}>Subscribe</button>
+            </div>
+          </div>
+
+          <div style={{ ...styles.footerBottom, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <p style={styles.footerCopyright}>
-              © 2026 FoodDash. All rights reserved. Built with ❤️ and powered by Supabase & Stripe.
+              © 2026 FoodDash Enterprise. All rights reserved.
             </p>
+            <p style={{ ...styles.footerCopyright, margin: 0 }}>Built with ❤️ · Powered by Supabase & Stripe</p>
           </div>
         </div>
       </footer>

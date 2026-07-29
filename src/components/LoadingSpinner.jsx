@@ -1,13 +1,13 @@
 import React from 'react';
 
-/* ── Inline spinner (small) ────────────────────────────────── */
+/* ── Inline spinner ─────────────────────────────────────────── */
 export function InlineSpinner({ size = 20, color = 'var(--primary)' }) {
   return (
     <span style={{
       display: 'inline-block',
       width: size,
       height: size,
-      border: `2.5px solid var(--border)`,
+      border: `2.5px solid rgba(255,255,255,0.2)`,
       borderTopColor: color,
       borderRadius: '50%',
       animation: 'spin 0.7s linear infinite',
@@ -17,66 +17,87 @@ export function InlineSpinner({ size = 20, color = 'var(--primary)' }) {
   );
 }
 
-/* ── Full-page loading screen with orbiting food emojis ────── */
+/* ── Full page enterprise loader with WebGL-inspired animation ─ */
 export function PageSpinner({ message = 'Loading...' }) {
   return (
     <div style={s.overlay}>
       <div style={s.spinnerBox}>
-        <div style={s.brandOrbit}>
-          <span style={s.centerEmoji}>🍕</span>
-          <div style={s.orbitItem1}>🍔</div>
-          <div style={s.orbitItem2}>🍣</div>
-          <div style={s.orbitItem3}>🧁</div>
+        <div style={s.ringOuter}>
+          <div style={s.ringInner} />
+          <div style={s.centerEmoji}>🍔</div>
         </div>
-        <p style={s.msg}>{message}</p>
+        <div style={s.labelWrap}>
+          <p style={s.msg}>{message}</p>
+          <div style={s.dotRow}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{ ...s.dot, animationDelay: `${i * 0.2}s` }} />
+            ))}
+          </div>
+        </div>
       </div>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes orbit {
-          0% { transform: rotate(0deg) translateX(45px) rotate(0deg); }
-          100% { transform: rotate(360deg) translateX(45px) rotate(-360deg); }
+        @keyframes pulseOrb {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.12); opacity: 0.85; }
         }
-        @keyframes pulseLogo {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.15); }
+        @keyframes dotBounce {
+          0%, 80%, 100% { transform: scaleY(0.4); }
+          40% { transform: scaleY(1); }
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
 }
 
-/* ── Error banner ──────────────────────────────────────────── */
+/* ── Error Banner ───────────────────────────────────────────── */
 export function ErrorBanner({ message, onRetry }) {
   return (
     <div style={s.errorBanner}>
-      <span style={{ fontSize: '1.8rem', marginRight: '0.2rem' }}>⚠️</span>
+      <span style={{ fontSize: '1.6rem', flexShrink: 0 }}>⚠️</span>
       <div style={{ flex: 1 }}>
-        <strong style={{ display: 'block', color: 'var(--primary-dark)', marginBottom: '0.2rem', fontFamily: 'var(--font-heading)', fontSize: '1.05rem' }}>Unable to load data</strong>
-        <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: '1.5' }}>{message || 'An unexpected error occurred. Please try again.'}</span>
+        <strong style={{ display: 'block', color: 'var(--primary-dark)', marginBottom: '0.2rem', fontFamily: 'var(--font-heading)', fontSize: '1rem' }}>
+          Unable to load data
+        </strong>
+        <span style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: '1.5' }}>
+          {message || 'An unexpected error occurred. Please try again.'}
+        </span>
       </div>
       {onRetry && (
         <button onClick={onRetry} style={s.retryBtn} className="animate-pulse-glow">
-          Retry
+          ↻ Retry
         </button>
       )}
     </div>
   );
 }
 
-/* ── Section loader (shimmer card skeletons) ───────────────── */
+/* ── Section Skeleton Loader (shimmer cards) ────────────────── */
 export function SectionSpinner({ message = 'Loading...' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%', padding: '1.5rem 0' }}>
-      <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.88rem', fontWeight: 700, letterSpacing: '0.01em', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.88rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <InlineSpinner size={16} /> {message}
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-        {[1, 2, 3].map(i => (
-          <div key={i} style={{ height: '220px', borderRadius: '16px', border: '1px solid var(--border-light)', overflow: 'hidden', background: '#fff', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            <div className="shimmer-bg" style={{ flex: 1, borderRadius: '12px' }} />
-            <div className="shimmer-bg" style={{ height: '18px', width: '60%', borderRadius: '4px' }} />
-            <div className="shimmer-bg" style={{ height: '12px', width: '40%', borderRadius: '4px' }} />
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} style={{
+            borderRadius: '20px', border: '1px solid var(--border-light)', overflow: 'hidden',
+            background: 'var(--surface-card)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+          }}>
+            {/* Image area */}
+            <div className="shimmer-bg" style={{ height: '180px' }} />
+            {/* Content */}
+            <div style={{ padding: '1rem 1.1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+              <div className="shimmer-bg" style={{ height: '20px', width: '70%', borderRadius: '6px' }} />
+              <div className="shimmer-bg" style={{ height: '14px', width: '50%', borderRadius: '4px' }} />
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.3rem' }}>
+                <div className="shimmer-bg" style={{ height: '12px', width: '30%', borderRadius: '4px' }} />
+                <div className="shimmer-bg" style={{ height: '12px', width: '25%', borderRadius: '4px' }} />
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -87,61 +108,42 @@ export function SectionSpinner({ message = 'Loading...' }) {
 const s = {
   overlay: {
     position: 'fixed', inset: 0,
-    display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center',
-    background: 'var(--surface-elevated)', backdropFilter: 'blur(10px)',
-    zIndex: 9999,
-    animation: 'fadeIn 0.25s ease forwards',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    background: 'rgba(15, 23, 42, 0.92)', backdropFilter: 'blur(16px)',
+    zIndex: 9999, animation: 'fadeIn 0.3s ease forwards',
   },
-  spinnerBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' },
-  brandOrbit: {
-    position: 'relative',
-    width: '100px',
-    height: '100px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: '0.5rem',
+  spinnerBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' },
+  ringOuter: {
+    position: 'relative', width: '90px', height: '90px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  ringInner: {
+    position: 'absolute', inset: 0,
+    border: '3px solid rgba(226,55,68,0.2)',
+    borderTopColor: '#e23744', borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
   },
   centerEmoji: {
-    fontSize: '2.5rem',
-    zIndex: 2,
-    animation: 'pulseLogo 2s infinite ease-in-out',
-    userSelect: 'none',
+    fontSize: '2.2rem',
+    animation: 'pulseOrb 2.5s ease-in-out infinite',
+    position: 'relative', zIndex: 1,
   },
-  orbitItem1: {
-    position: 'absolute',
-    fontSize: '1.35rem',
-    zIndex: 1,
-    animation: 'orbit 3s infinite linear',
-    userSelect: 'none',
+  labelWrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' },
+  msg: { margin: 0, color: '#e2e8f0', fontSize: '1rem', fontWeight: 600, fontFamily: 'var(--font-heading)' },
+  dotRow: { display: 'flex', gap: '5px', alignItems: 'flex-end', height: '20px' },
+  dot: {
+    width: '5px', height: '16px', background: '#e23744', borderRadius: '3px',
+    animation: 'dotBounce 1.2s ease-in-out infinite',
   },
-  orbitItem2: {
-    position: 'absolute',
-    fontSize: '1.35rem',
-    zIndex: 1,
-    animation: 'orbit 3s infinite linear',
-    animationDelay: '-1s',
-    userSelect: 'none',
-  },
-  orbitItem3: {
-    position: 'absolute',
-    fontSize: '1.35rem',
-    zIndex: 1,
-    animation: 'orbit 3s infinite linear',
-    animationDelay: '-2s',
-    userSelect: 'none',
-  },
-  msg: { margin: 0, color: 'var(--text-main)', fontSize: '1rem', fontWeight: '800', letterSpacing: '0.01em', fontFamily: 'var(--font-heading)' },
   errorBanner: {
-    display: 'flex', alignItems: 'center', gap: '1.25rem',
-    background: 'var(--danger-bg)', border: '1px solid rgba(226, 55, 68, 0.15)', borderRadius: 'var(--radius-md)',
-    padding: '1.2rem 1.5rem', margin: '1rem 0',
-    animation: 'fadeIn 0.3s ease',
+    background: 'var(--danger-bg)', border: '1.5px solid rgba(226,55,68,0.2)',
+    borderRadius: '16px', padding: '1.2rem 1.4rem',
+    display: 'flex', alignItems: 'flex-start', gap: '1rem',
+    margin: '1.5rem 0',
   },
   retryBtn: {
-    padding: '0.55rem 1.25rem', background: 'var(--primary)', color: 'white',
-    border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer',
-    fontWeight: '800', fontSize: '0.85rem', whiteSpace: 'nowrap',
-    boxShadow: 'var(--shadow-primary)',
+    flexShrink: 0, padding: '0.6rem 1.2rem', background: 'var(--primary)', color: 'white',
+    border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 800, fontSize: '0.85rem',
+    boxShadow: '0 4px 12px rgba(226,55,68,0.3)',
   },
 };

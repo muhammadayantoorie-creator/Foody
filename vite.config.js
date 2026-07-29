@@ -52,6 +52,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         // Force new SW to take over immediately — clears stale cached bundles
         skipWaiting: true,
         clientsClaim: true,

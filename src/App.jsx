@@ -19,6 +19,8 @@ import AdminDashboard from './components/AdminDashboard';
 import RiderDashboard from './components/RiderDashboard';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import NotFound from './pages/NotFound';
+import DesktopTitlebar from './components/DesktopTitlebar';
+import DesktopStatusBar from './components/DesktopStatusBar';
 
 // Component to handle redirecting already logged-in users away from auth pages
 const PublicRoute = ({ children }) => {
@@ -129,11 +131,17 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
-          <Toaster position="top-right" />
-          <CartSidebar />
-          <AppRoutes />
-        </Router>
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <DesktopTitlebar />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Router>
+              <Toaster position="top-right" />
+              <CartSidebar />
+              <AppRoutes />
+            </Router>
+          </div>
+          <DesktopStatusBar />
+        </div>
       </CartProvider>
     </AuthProvider>
   );

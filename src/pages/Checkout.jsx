@@ -477,7 +477,7 @@ export default function Checkout() {
   }
 
   return (
-    <div style={ui.page}>
+    <div style={ui.page} className="page-enter">
       <Header navigate={navigate} step={step} />
       <main style={ui.main}>
         <div style={ui.card}>

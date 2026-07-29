@@ -102,7 +102,7 @@ export default function CustomerOrders() {
   const pastOrders = orders.filter(o => ['Delivered', 'Cancelled'].includes(o.status));
 
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="page-enter">
       {/* Navbar Header */}
       <nav style={styles.nav}>
         <div style={styles.navInner}>

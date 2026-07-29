@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { PageSpinner } from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
+import { ArrowLeft, ShoppingCart, Search, Leaf } from 'lucide-react';
 
 export default function RestaurantMenu() {
   const { id } = useParams();
@@ -136,23 +137,26 @@ export default function RestaurantMenu() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F5F5', fontFamily: 'var(--font-body)' }}>
+    <div style={{ minHeight: '100vh', background: '#F8FAFC', fontFamily: 'var(--font-body)' }} className="page-enter">
 
       {/* ── Navbar ── */}
       <nav style={S.nav}>
         <div style={S.navInner}>
           <button onClick={() => navigate('/dashboard')} style={S.backBtn}>
-            ← Back
+            <ArrowLeft size={16} />
+            <span>Back</span>
           </button>
           <div style={S.navBrand} onClick={() => navigate('/dashboard')}>
-            <span style={{ fontSize: '1.4rem' }}>🍕</span>
+            <div style={{ width: '34px', height: '34px', background: 'linear-gradient(135deg, #e23744, #ff6b35)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(226,55,68,0.35)' }}>
+              <span style={{ fontSize: '1.1rem' }}>🍔</span>
+            </div>
             <span style={S.brandTxt}>FoodDash</span>
           </div>
           {role === 'Customer' ? (
             <button onClick={toggleSidebar} style={S.cartBtn}>
-              <span>🛒</span>
+              <ShoppingCart size={17} />
               <span>Cart</span>
-              <span style={S.cartCount}>{getCartCount()}</span>
+              {getCartCount() > 0 && <span style={S.cartCount}>{getCartCount()}</span>}
             </button>
           ) : (
             <div style={{ width: '90px' }} />
@@ -167,20 +171,25 @@ export default function RestaurantMenu() {
           alt={restaurant.name}
           style={S.heroImg}
         />
-        <div style={S.heroOverlay}>
+        <div style={{ ...S.heroOverlay, background: 'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.2) 100%)' }}>
           <div style={S.heroContent}>
             <div style={S.heroMainInfo}>
+              {/* Status badge */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(27,166,114,0.25)', backdropFilter: 'blur(8px)', border: '1px solid rgba(27,166,114,0.4)', borderRadius: '20px', padding: '4px 12px', marginBottom: '0.6rem' }}>
+                <span className="status-dot-live" />
+                <span style={{ color: '#4ade80', fontSize: '0.75rem', fontWeight: 700 }}>OPEN NOW</span>
+              </div>
               <h1 style={S.heroTitle}>{restaurant.name}</h1>
               <p style={S.heroDesc}>{restaurant.cuisine || 'North Indian • Chinese • Italian'}</p>
               {restaurant.address && <p style={S.heroAddr}>📍 {restaurant.address}</p>}
               <div style={S.heroMetaRow}>
                 <span style={S.tagBadge}>⏱ {restaurant.delivery_time || '30-45 mins'}</span>
                 <span style={S.tagBadge}>💰 {restaurant.price_range || '$20'} for two</span>
-                <span style={S.tagBadge}>🛵 Free Delivery</span>
+                <span style={{ ...S.tagBadge, background: 'rgba(27,166,114,0.3)', borderColor: 'rgba(27,166,114,0.5)' }}>🛵 Free Delivery</span>
               </div>
             </div>
             <div style={S.heroRatingCard}>
-              <div style={{ background: restaurant.rating >= 4 ? '#1BA672' : restaurant.rating >= 3 ? '#DB7C0E' : '#E23744', padding: '0.5rem 0.75rem', borderRadius: '8px' }}>
+              <div style={{ background: restaurant.rating >= 4 ? '#1BA672' : restaurant.rating >= 3 ? '#DB7C0E' : '#E23744', padding: '0.5rem 0.75rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>
                 <span style={{ color: 'white', fontWeight: 900, fontSize: '1.2rem' }}>★ {restaurant.rating ? restaurant.rating.toFixed(1) : 'New'}</span>
               </div>
               <div style={{ marginLeft: '0.75rem' }}>
@@ -196,7 +205,7 @@ export default function RestaurantMenu() {
       <div style={S.filterBar}>
         <div style={S.filterBarInner}>
           <div style={S.searchBox}>
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', flexShrink: 0 }}>🔍</span>
+            <Search size={15} color="var(--text-muted)" style={{ flexShrink: 0 }} />
             <input
               type="text"
               placeholder="Search dishes..."
@@ -209,23 +218,13 @@ export default function RestaurantMenu() {
             )}
           </div>
 
-          <div style={S.vegToggleWrap}>
-            <div
-              style={{
-                ...S.vegDot,
-                border: `2px solid ${vegOnly ? '#1BA672' : '#ccc'}`,
-              }}
-              onClick={() => setVegOnly(!vegOnly)}
-            >
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1BA672' }} />
-            </div>
-            <span
-              style={{ fontSize: '0.85rem', fontWeight: 700, color: vegOnly ? '#1BA672' : 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
-              onClick={() => setVegOnly(!vegOnly)}
-            >
-              Veg Only
-            </span>
-          </div>
+          <button
+            onClick={() => setVegOnly(!vegOnly)}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '20px', border: `1.5px solid ${vegOnly ? '#1BA672' : 'var(--border)'}`, background: vegOnly ? 'rgba(27,166,114,0.08)' : '#fff', cursor: 'pointer', transition: 'all 0.2s' }}
+          >
+            <Leaf size={14} color={vegOnly ? '#1BA672' : 'var(--text-muted)'} />
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: vegOnly ? '#1BA672' : 'var(--text-secondary)', userSelect: 'none' }}>Veg Only</span>
+          </button>
         </div>
       </div>
 
