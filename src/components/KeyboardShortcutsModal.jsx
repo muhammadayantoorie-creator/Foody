@@ -15,6 +15,9 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }) {
         { keyCombo: ['Ctrl', 'B'], label: isRTL ? 'شاپنگ کارٹ ڈراور کھولیں' : 'Toggle Shopping Cart Drawer' },
         { keyCombo: ['Ctrl', 'M'], label: isRTL ? 'میرے آرڈرز پر جائیں' : 'Go to My Orders & History' },
         { keyCombo: ['Ctrl', 'S'], label: isRTL ? 'سسٹم سیٹنگز کھولیں' : 'Open Enterprise System Settings' },
+        { keyCombo: ['Ctrl', 'N'], label: isRTL ? 'AI فوڈ اسسٹنٹ کھولیں' : 'Open AI Food Assistant & Chat' },
+        { keyCombo: ['Ctrl', 'A'], label: isRTL ? 'اینالیٹکس رپورٹ دیکھیں' : 'Open Analytics & Revenue Reports' },
+        { keyCombo: ['F1'], label: isRTL ? 'ہیلپ سینٹر اور سپورٹ' : 'Open Help Center & Support' },
       ]
     },
     {

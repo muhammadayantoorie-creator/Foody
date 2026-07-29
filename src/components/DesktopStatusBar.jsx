@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff, Printer, Zap, Keyboard, Clock, Search, Settings, HelpCircle, Globe, DollarSign } from 'lucide-react';
+import { Wifi, WifiOff, Zap, Clock, Search, Settings, HelpCircle, Globe, DollarSign, Bot, User, BarChart3 } from 'lucide-react';
 import { useLanguageCurrency } from '../contexts/LanguageCurrencyContext';
 
-export default function DesktopStatusBar({ onOpenCommand, onOpenSettings, onOpenShortcuts }) {
+export default function DesktopStatusBar({ onOpenCommand, onOpenSettings, onOpenShortcuts, onOpenAi, onOpenProfile, onOpenAnalytics, onOpenHelp }) {
   const isElectron = !!window.electronAPI;
   const { language, toggleLanguage, currency, toggleCurrency, formatPKRDate } = useLanguageCurrency();
 
@@ -112,6 +112,36 @@ export default function DesktopStatusBar({ onOpenCommand, onOpenSettings, onOpen
         {/* Shortcuts Trigger */}
         <button onClick={onOpenShortcuts} style={styles.btnTrigger} title="Keyboard Shortcuts (?)">
           <HelpCircle size={10} color="#8B5CF6" />
+        </button>
+
+        <span style={styles.sep}>·</span>
+
+        {/* AI Assistant Trigger */}
+        <button onClick={onOpenAi} style={styles.btnTrigger} title="AI Food Assistant (Ctrl + N)">
+          <Bot size={10} color="#EC4899" />
+          <span style={{ ...styles.text, color: '#EC4899' }}>AI</span>
+        </button>
+
+        <span style={styles.sep}>·</span>
+
+        {/* Profile Trigger */}
+        <button onClick={onOpenProfile} style={styles.btnTrigger} title="My Profile & Security">
+          <User size={10} color="#34D399" />
+        </button>
+
+        <span style={styles.sep}>·</span>
+
+        {/* Analytics Trigger */}
+        <button onClick={onOpenAnalytics} style={styles.btnTrigger} title="Analytics & Reports (Ctrl + A)">
+          <BarChart3 size={10} color="#FF6B35" />
+        </button>
+
+        <span style={styles.sep}>·</span>
+
+        {/* Help Center */}
+        <button onClick={onOpenHelp} style={styles.btnTrigger} title="Help Center & Support (F1)">
+          <HelpCircle size={10} color="#F59E0B" />
+          <span style={{ ...styles.text, color: '#F59E0B' }}>Help</span>
         </button>
 
         <span style={styles.sep}>·</span>
