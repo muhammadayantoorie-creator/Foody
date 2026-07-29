@@ -10,41 +10,67 @@
 
     <!-- Viewport & Theme -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#E23744" />
-    <meta name="background-color" content="#0F0F1A" />
+    <meta name="theme-color" content="#FF6B35" />
+    <meta name="background-color" content="#0B0F19" />
 
     <!-- iOS PWA support -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="FoodDash" />
+    <meta name="apple-mobile-web-app-title" content="FoodDash Enterprise" />
 
     <!-- Android PWA -->
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="application-name" content="FoodDash" />
+    <meta name="application-name" content="FoodDash Enterprise" />
 
-    <!-- SEO -->
-    <meta name="description" content="FoodDash — Order delicious food from the best restaurants near you. Fast delivery, live tracking, and premium dining experience." />
-    <meta name="keywords" content="food delivery, restaurant, order food online, fast food, FoodDash" />
+    <!-- Enterprise SEO -->
+    <title>FoodDash — Food Delivered Smarter, Faster & Fresher</title>
+    <meta name="description" content="FoodDash Enterprise — Next-gen 3D food delivery and logistics platform. Order gourmet food from 500+ top-rated artisanal kitchens with 15-min delivery and real-time 3D GPS radar tracking." />
+    <meta name="keywords" content="FoodDash, food delivery, gourmet burgers, pizza delivery, sushi, 3D tracking, fast food logistics, food app" />
+    <meta name="author" content="Muhammad Ayan" />
 
-    <!-- Open Graph (for sharing links) -->
-    <meta property="og:title" content="FoodDash — Delicious Food, Delivered Fast" />
-    <meta property="og:description" content="Order from the best restaurants near you with live GPS tracking." />
+    <!-- Open Graph (Facebook / LinkedIn) -->
+    <meta property="og:title" content="FoodDash Enterprise — Food Delivered Smarter, Faster & Fresher" />
+    <meta property="og:description" content="Order gourmet dishes with live 3D GPS radar tracking and 15-minute express delivery." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:url" content="https://fooddash.app" />
+    <meta property="og:image" content="/images/app_preview.png" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FoodDash Enterprise — 3D Food Logistics" />
+    <meta name="twitter:description" content="Gourmet food delivered in 15 mins with real-time GPS tracking." />
+    <meta name="twitter:image" content="/images/app_preview.png" />
+
+    <!-- JSON-LD Structured Data for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FoodEstablishment",
+      "name": "FoodDash Enterprise",
+      "image": "https://fooddash.app/images/app_preview.png",
+      "description": "Next-generation 3D food delivery and logistics platform.",
+      "url": "https://fooddash.app",
+      "telephone": "+1-800-FOOD-DASH",
+      "priceRange": "$$",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "120000"
+      }
+    }
+    </script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-    <title>FoodDash — Delicious Food, Delivered Fast</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Okra:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="root"></div>
-    <!-- Cache buster: clears stale PWA caches that may serve old JS bundles -->
+
+    <!-- Cache buster for stale PWA service workers -->
     <script>
       if ('serviceWorker' in navigator) {
-        // Unregister all old service workers and clear all caches
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
           for (let registration of registrations) {
             registration.unregister();

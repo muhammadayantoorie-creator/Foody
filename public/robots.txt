@@ -1,0 +1,7 @@
+# FoodDash Enterprise Robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /rider
+
+Sitemap: https://fooddash.app/sitemap.xml

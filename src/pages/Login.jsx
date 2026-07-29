@@ -147,7 +147,7 @@ export default function Login() {
         <div style={S.leftOverlay} />
         <div style={S.leftContent}>
           <div style={S.logoRow} className="animate-fade-up">
-            <img src="/images/logo.png" alt="FoodDash Logo" style={{ width: '44px', height: '44px', borderRadius: '12px', objectFit: 'cover', boxShadow: '0 8px 20px rgba(226,55,68,0.4)', flexShrink: 0 }} />
+            <img src="/images/logo.png" alt="FoodDash Logo" style={{ width: '48px', height: '48px', borderRadius: '14px', objectFit: 'cover', boxShadow: '0 8px 24px rgba(255,107,53,0.5)', flexShrink: 0 }} />
             <h1 style={S.brand}>FoodDash</h1>
             <span style={S.enterpriseBadge}>ENTERPRISE</span>
           </div>
@@ -163,9 +163,9 @@ export default function Login() {
 
           <div style={S.trustRow} className="animate-fade-up stagger-3">
             {[
-              { icon: <Zap size={14} color="#f5a623" />, text: '20-min delivery' },
-              { icon: <MapPin size={14} color="#e23744" />, text: 'Live GPS tracking' },
-              { icon: <BadgeCheck size={14} color="#1ba672" />, text: 'Verified restaurants' },
+              { icon: <Zap size={14} color="#FFB703" />, text: '15-min Express Delivery' },
+              { icon: <MapPin size={14} color="#2EC4B6" />, text: 'Sub-meter GPS Radar' },
+              { icon: <BadgeCheck size={14} color="#2EC4B6" />, text: '500+ Verified Kitchens' },
             ].map((b, i) => (
               <div key={i} style={S.trustBadge}>
                 {b.icon}
@@ -195,13 +195,19 @@ export default function Login() {
         <div style={S.formCard} className="animate-scale-in">
           {/* Mobile logo */}
           <div style={S.mobileLogo}>
-            <span style={{ fontSize: '1.8rem' }}>🍔</span>
+            <img src="/images/logo.png" alt="FoodDash" style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover' }} />
             <span style={S.mobileLogoText}>FoodDash Enterprise</span>
           </div>
 
           <div style={S.formHeader}>
             <h2 style={S.formTitle}>Welcome back 👋</h2>
-            <p style={S.formSub}>Sign in to your enterprise account</p>
+            <p style={S.formSub}>Sign in to your FoodDash Enterprise account</p>
+          </div>
+
+          {/* Demo hint */}
+          <div style={{ background: 'rgba(255,107,53,0.06)', border: '1px solid rgba(255,107,53,0.2)', borderRadius: '12px', padding: '0.75rem 1rem', marginBottom: '0.5rem', fontSize: '0.8rem', color: '#FF6B35', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>🔐</span>
+            <span>Use your registered email &amp; password to sign in</span>
           </div>
 
           {error && (
@@ -254,9 +260,9 @@ export default function Login() {
               </div>
             </div>
 
-            <button type="submit" disabled={loading} style={{ ...S.submitBtn, opacity: loading ? 0.85 : 1 }} className={!loading ? 'animate-pulse-glow' : ''}>
+            <button type="submit" disabled={loading} style={{ ...S.submitBtn, opacity: loading ? 0.85 : 1 }} className="btn-ripple">
               {loading
-                ? <><InlineSpinner size={18} color="white" /> Signing in...</>
+                ? <><InlineSpinner size={18} color="white" /> Authenticating...</>
                 : <><span>Sign In to Enterprise Suite</span><ArrowRight size={18} /></>
               }
             </button>
@@ -285,7 +291,7 @@ export default function Login() {
 }
 
 const S = {
-  page: { display: 'flex', minHeight: '100vh', fontFamily: 'var(--font-body)', background: '#0f172a' },
+  page: { display: 'flex', minHeight: '100vh', fontFamily: 'var(--font-body)', background: '#0B0F19' },
 
   leftPanel: {
     flex: '1 0 50%',
@@ -295,11 +301,11 @@ const S = {
     alignItems: 'center',
     justifyContent: 'center',
     padding: '3rem',
-    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+    background: 'linear-gradient(135deg, #0B0F19 0%, #111827 50%, #0B0F19 100%)',
   },
   leftOverlay: {
     position: 'absolute', inset: 0,
-    background: 'linear-gradient(160deg, rgba(226,55,68,0.1) 0%, transparent 50%, rgba(124,58,237,0.08) 100%)',
+    background: 'linear-gradient(160deg, rgba(255,107,53,0.12) 0%, transparent 50%, rgba(46,196,182,0.08) 100%)',
     zIndex: 2,
   },
   leftContent: { maxWidth: '440px', position: 'relative', zIndex: 10 },
@@ -314,7 +320,7 @@ const S = {
   brand: { margin: 0, color: '#ffffff', fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.03em', fontFamily: 'var(--font-heading)' },
   enterpriseBadge: {
     fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.08em',
-    background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+    background: 'linear-gradient(135deg, #FF6B35, #FF8C42)',
     color: '#fff', padding: '3px 8px', borderRadius: '4px',
   },
   heroText: {
@@ -342,13 +348,13 @@ const S = {
   /* Right Panel */
   rightPanel: {
     flex: '1 0 50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    padding: '2rem', background: '#f8fafc', overflowY: 'auto',
+    padding: '2rem', background: '#F8FAFC', overflowY: 'auto',
   },
   formCard: {
-    width: '100%', maxWidth: '460px',
-    background: '#ffffff', borderRadius: '24px', padding: '2.8rem',
-    boxShadow: '0 24px 64px rgba(0,0,0,0.1), 0 4px 16px rgba(0,0,0,0.06)',
-    border: '1px solid #e2e8f0',
+    width: '100%', maxWidth: '480px',
+    background: '#ffffff', borderRadius: '28px', padding: '3rem',
+    boxShadow: '0 32px 64px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.06)',
+    border: '1.5px solid #F1F5F9',
   },
   mobileLogo: { display: 'none', alignItems: 'center', gap: '0.4rem', marginBottom: '1.8rem' },
   mobileLogoText: { fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: 900, color: 'var(--primary)' },
@@ -368,12 +374,12 @@ const S = {
   label: { fontSize: '0.78rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em' },
   inputWrap: {
     position: 'relative', display: 'flex', alignItems: 'center',
-    border: '1.5px solid #e2e8f0', borderRadius: '12px',
-    background: '#f8fafc', transition: 'border-color 0.2s, box-shadow 0.2s',
+    border: '1.5px solid #E2E8F0', borderRadius: '14px',
+    background: '#F8FAFC', transition: 'border-color 0.2s, box-shadow 0.2s',
   },
   inputWrapFocused: {
-    borderColor: 'var(--primary)',
-    boxShadow: '0 0 0 3px rgba(226,55,68,0.1)',
+    borderColor: '#FF6B35',
+    boxShadow: '0 0 0 4px rgba(255,107,53,0.12)',
     background: '#ffffff',
   },
   input: {
@@ -386,12 +392,12 @@ const S = {
     color: '#94a3b8', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center',
   },
   submitBtn: {
-    padding: '1rem', background: 'linear-gradient(135deg, #E23744, #CB202D)',
-    color: 'white', border: 'none', borderRadius: '14px', fontSize: '0.95rem',
-    fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center',
+    padding: '1rem 1.5rem', background: 'linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%)',
+    color: 'white', border: 'none', borderRadius: '16px', fontSize: '1rem',
+    fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center',
     justifyContent: 'center', gap: '0.5rem',
-    boxShadow: '0 8px 24px rgba(226,55,68,0.35)', letterSpacing: '0.01em',
-    transition: 'all 0.3s', marginTop: '0.3rem',
+    boxShadow: '0 10px 30px rgba(255,107,53,0.38)', letterSpacing: '0.01em',
+    transition: 'all 0.3s', marginTop: '0.5rem',
   },
   forgotLink: { color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 600 },
   divider: { display: 'flex', alignItems: 'center', gap: '0.8rem', margin: '1.5rem 0' },
@@ -399,8 +405,8 @@ const S = {
   dividerText: { color: '#94a3b8', fontSize: '0.8rem', whiteSpace: 'nowrap', fontWeight: 500 },
   signupBtn: {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    padding: '0.9rem', border: '1.5px solid #e2e8f0', borderRadius: '14px',
-    color: '#334155', fontWeight: 600, fontSize: '0.95rem', transition: 'all 0.25s', background: '#f8fafc',
+    padding: '0.9rem', border: '1.5px solid #E2E8F0', borderRadius: '16px',
+    color: '#FF6B35', fontWeight: 700, fontSize: '0.95rem', transition: 'all 0.25s', background: '#FFF7F0',
     textDecoration: 'none',
   },
   footerNote: { textAlign: 'center', color: '#94a3b8', fontSize: '0.76rem', margin: '1.2rem 0 0', lineHeight: 1.6 },

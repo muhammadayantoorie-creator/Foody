@@ -127,10 +127,15 @@ function AppRoutes() {
   );
 }
 
+import BrandSplashScreen from './components/BrandSplashScreen';
+
 function App() {
+  const [showSplash, setShowSplash] = React.useState(true);
+
   return (
     <AuthProvider>
       <CartProvider>
+        {showSplash && <BrandSplashScreen onComplete={() => setShowSplash(false)} />}
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <DesktopTitlebar />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

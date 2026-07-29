@@ -7,12 +7,15 @@ import { SectionSpinner } from '../components/LoadingSpinner';
 import { useIsMobile } from '../hooks/useIsMobile';
 import Food3DHeroCanvas from '../components/Food3DHeroCanvas';
 import TiltCard from '../components/TiltCard';
+import FAQSection from '../components/FAQSection';
+import NotificationsDrawer from '../components/NotificationsDrawer';
 import toast from 'react-hot-toast';
 import {
   Search, Sparkles, MapPin, Star, Flame, SlidersHorizontal, Filter, ShieldCheck,
   Zap, Clock, Heart, Mic, MicOff, CheckCircle2, Truck, Navigation, PhoneCall,
   Smartphone, QrCode, ArrowRight, ChevronRight, Award, User, LogOut, ShoppingBag,
-  TrendingUp, ThumbsUp, RefreshCw, Send, Check
+  TrendingUp, ThumbsUp, RefreshCw, Send, Check, Bell, Moon, Sun, X, Mail,
+  Globe, ChevronDown, HelpCircle, Tag
 } from 'lucide-react';
 
 /* ─── Design Tokens (Apple / Stripe / Linear / FoodDash Enterprise) ─── */
@@ -245,6 +248,8 @@ export default function Dashboard() {
   const [isListening, setIsListening] = useState(false);
   const [likedMap, setLikedMap] = useState({});
   const [scrolled, setScrolled] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Filters
   const [filterRating4, setFilterRating4] = useState(false);
@@ -375,7 +380,7 @@ export default function Dashboard() {
   const cartCount = getCartCount();
 
   return (
-    <div style={styles.pageWrap} className="page-enter">
+    <div style={styles.pageWrap} className={`page-enter${darkMode ? ' dark-mode' : ''}`}>
       {/* ── Top Scroll Progress Bar ── */}
       <div style={{ ...styles.scrollProgressBar, width: `${scrollProgress}%` }} />
 
@@ -424,6 +429,29 @@ export default function Dashboard() {
               </button>
             )}
 
+            {/* Notification Bell */}
+            <button
+              onClick={() => setShowNotifications(true)}
+              style={{ ...styles.navGhostBtn, position: 'relative', padding: '0.55rem' }}
+              title="Notifications"
+            >
+              <Bell size={18} color="#0B0F19" />
+              <span style={{
+                position: 'absolute', top: '4px', right: '4px',
+                width: '8px', height: '8px', borderRadius: '50%',
+                background: '#FF6B35', border: '2px solid #fff',
+              }} />
+            </button>
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setDarkMode(d => !d)}
+              style={{ ...styles.navGhostBtn, padding: '0.55rem' }}
+              title={darkMode ? 'Light Mode' : 'Dark Mode'}
+            >
+              {darkMode ? <Sun size={18} color="#FFB703" /> : <Moon size={18} color="#475569" />}
+            </button>
+
             {/* Cart Button */}
             <button onClick={toggleSidebar} style={styles.navCartBtn}>
               <ShoppingBag size={18} />
@@ -455,6 +483,9 @@ export default function Dashboard() {
           </div>
         </div>
       </nav>
+
+      {/* Notifications Drawer */}
+      <NotificationsDrawer isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
 
       {/* ── 2. HERO SECTION (3D WEBGL + ENTERPRISE TEXT + FLOATING SMARTPHONE) ── */}
       <section id="hero" style={styles.heroSection}>
@@ -1064,7 +1095,180 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* ── 12. ENTERPRISE FOOTER ── */}
+      {/* ── 12. TODAY'S DEALS BANNER ── */}
+      <section style={styles.sectionWrap}>
+        <div style={{
+          background: 'linear-gradient(135deg, #FF6B35 0%, #FF8C42 50%, #FFB703 100%)',
+          borderRadius: '32px',
+          padding: '3rem 2.5rem',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '2rem',
+          alignItems: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Background glow pattern */}
+          <div style={{ position: 'absolute', inset: 0, opacity: 0.08, backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '20px 20px', pointerEvents: 'none' }} />
+
+          <div style={{ position: 'relative', zIndex: 2 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0,0,0,0.15)', borderRadius: '20px', padding: '4px 12px', marginBottom: '0.8rem' }}>
+              <Tag size={13} color="#fff" />
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#fff', letterSpacing: '0.08em' }}>TODAY ONLY · LIMITED SEATS</span>
+            </div>
+            <h2 style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', margin: '0 0 0.6rem', fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+              Up to 40% OFF<br />Your First 3 Orders
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1rem', lineHeight: 1.5, margin: '0 0 1.5rem' }}>
+              Use code <strong style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 8px', borderRadius: '6px' }}>FOODDASH40</strong> at checkout. Valid on all restaurants tonight.
+            </p>
+            <button
+              onClick={() => { const el = document.getElementById('restaurants'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '0.9rem 2rem', background: '#fff', color: '#FF6B35', border: 'none', borderRadius: '14px', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
+            >
+              Claim Deal Now <ArrowRight size={16} />
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', position: 'relative', zIndex: 2 }}>
+            {[
+              { emoji: '🍔', label: 'Burgers', off: '40% OFF' },
+              { emoji: '🍕', label: 'Pizzas', off: '35% OFF' },
+              { emoji: '🍣', label: 'Sushi', off: '30% OFF' },
+              { emoji: '🌮', label: 'Tacos', off: '25% OFF' },
+            ].map((d, i) => (
+              <div key={i} style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', borderRadius: '16px', padding: '1rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.25)' }}>
+                <div style={{ fontSize: '2rem', marginBottom: '4px' }}>{d.emoji}</div>
+                <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#fff' }}>{d.label}</div>
+                <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.8)', fontWeight: 700 }}>{d.off}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 13. DELIVERY COVERAGE SECTION ── */}
+      <section style={styles.sectionWrap} id="coverage">
+        <div style={styles.sectionHeaderCenter}>
+          <div style={styles.sectionBadge}>
+            <Globe size={14} color="#FF6B35" />
+            <span>DELIVERY COVERAGE</span>
+          </div>
+          <h2 style={styles.sectionTitle}>Serving 120+ Cities Worldwide</h2>
+          <p style={styles.sectionSubtitle}>From New York to London — FoodDash delivers gourmet food everywhere</p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+          {[
+            { city: 'New York', flag: '🗽', restaurants: '142', time: '12 min avg' },
+            { city: 'London', flag: '🇬🇧', restaurants: '98', time: '18 min avg' },
+            { city: 'Dubai', flag: '🇦🇪', restaurants: '76', time: '15 min avg' },
+            { city: 'Toronto', flag: '🇨🇦', restaurants: '64', time: '20 min avg' },
+            { city: 'Sydney', flag: '🇦🇺', restaurants: '53', time: '22 min avg' },
+            { city: 'Singapore', flag: '🇸🇬', restaurants: '87', time: '14 min avg' },
+          ].map((c, i) => (
+            <div key={i} className="hover-lift" style={{
+              background: '#FFFFFF', border: '1.5px solid #F1F5F9', borderRadius: '20px',
+              padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.9rem',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.03)', cursor: 'pointer', transition: 'all 0.25s ease',
+            }}>
+              <div style={{ fontSize: '2.2rem' }}>{c.flag}</div>
+              <div>
+                <div style={{ fontWeight: 800, color: '#0B0F19', fontSize: '1rem', fontFamily: 'var(--font-heading)' }}>{c.city}</div>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600 }}>{c.restaurants} restaurants · {c.time}</div>
+              </div>
+              <div style={{ marginLeft: 'auto', width: '28px', height: '28px', borderRadius: '50%', background: '#FFF7F0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ChevronRight size={14} color="#FF6B35" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 14. FAQ SECTION ── */}
+      <FAQSection />
+
+      {/* ── 15. CONTACT / SUPPORT SECTION ── */}
+      <section id="contact" style={styles.sectionWrap}>
+        <div style={{
+          background: '#F8FAFC', borderRadius: '32px', padding: '3.5rem 2.5rem',
+          border: '1.5px solid #E2E8F0',
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '2.5rem', alignItems: 'start',
+        }}>
+          <div>
+            <div style={styles.sectionBadge}>
+              <Mail size={14} color="#FF6B35" />
+              <span>GET IN TOUCH</span>
+            </div>
+            <h2 style={{ ...styles.sectionTitle, marginTop: '0.5rem' }}>We're Here to Help, 24/7</h2>
+            <p style={{ color: '#64748B', lineHeight: 1.6, marginTop: '0.6rem' }}>
+              Our enterprise support team resolves every query in under 30 seconds via live chat, phone, or email.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginTop: '1.5rem' }}>
+              {[
+                { icon: '📞', label: 'Phone Support', val: '+1 (800) FOOD-DASH', hint: 'Mon–Sun, 24 hours' },
+                { icon: '✉️', label: 'Email Support', val: 'support@fooddash.app', hint: 'Response within 2 hours' },
+                { icon: '💬', label: 'Live Chat', val: 'Chat with an Agent', hint: 'Avg. 30 sec wait time' },
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.9rem', padding: '0.9rem 1rem', background: '#fff', borderRadius: '16px', border: '1px solid #F1F5F9', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                  <div style={{ fontSize: '1.5rem', width: '40px', textAlign: 'center' }}>{item.icon}</div>
+                  <div>
+                    <div style={{ fontWeight: 800, color: '#0B0F19', fontSize: '0.9rem' }}>{item.label}</div>
+                    <div style={{ color: '#FF6B35', fontSize: '0.85rem', fontWeight: 700 }}>{item.val}</div>
+                    <div style={{ color: '#94A3B8', fontSize: '0.72rem' }}>{item.hint}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact Form */}
+          <div style={{ background: '#fff', borderRadius: '24px', padding: '2rem', border: '1.5px solid #E2E8F0', boxShadow: '0 8px 30px rgba(0,0,0,0.04)' }}>
+            <h3 style={{ margin: '0 0 1.5rem', fontWeight: 800, color: '#0B0F19', fontSize: '1.15rem', fontFamily: 'var(--font-heading)' }}>Send Us a Message</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <input
+                type="text"
+                placeholder="Your full name"
+                style={{ padding: '0.8rem 1rem', borderRadius: '12px', border: '1.5px solid #E2E8F0', outline: 'none', fontSize: '0.9rem', fontFamily: 'var(--font-body)', color: '#0B0F19' }}
+                aria-label="Full name"
+              />
+              <input
+                type="email"
+                placeholder="Your email address"
+                style={{ padding: '0.8rem 1rem', borderRadius: '12px', border: '1.5px solid #E2E8F0', outline: 'none', fontSize: '0.9rem', fontFamily: 'var(--font-body)', color: '#0B0F19' }}
+                aria-label="Email address"
+              />
+              <select
+                style={{ padding: '0.8rem 1rem', borderRadius: '12px', border: '1.5px solid #E2E8F0', outline: 'none', fontSize: '0.9rem', fontFamily: 'var(--font-body)', color: '#475569', background: '#fff' }}
+                aria-label="Subject"
+              >
+                <option value="">Select a subject…</option>
+                <option>Order Issue</option>
+                <option>Payment Problem</option>
+                <option>Restaurant Partnership</option>
+                <option>Rider Recruitment</option>
+                <option>General Enquiry</option>
+              </select>
+              <textarea
+                placeholder="Describe your issue or question…"
+                rows={4}
+                style={{ padding: '0.8rem 1rem', borderRadius: '12px', border: '1.5px solid #E2E8F0', outline: 'none', fontSize: '0.9rem', fontFamily: 'var(--font-body)', color: '#0B0F19', resize: 'vertical' }}
+                aria-label="Message"
+              />
+              <button
+                onClick={() => toast.success('Message sent! Our team will respond within 2 hours. 📩')}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '0.9rem', background: BRAND.primaryGrad, color: '#fff', border: 'none', borderRadius: '14px', fontWeight: 800, fontSize: '0.95rem', cursor: 'pointer', boxShadow: BRAND.primaryGlow }}
+              >
+                <Send size={16} /> Send Message
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 16. ENTERPRISE FOOTER ── */}
       <footer style={styles.footerWrap}>
         <div style={styles.footerContainer}>
           <div style={styles.footerMainGrid}>
