@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 import { PageSpinner, SectionSpinner, ErrorBanner } from '../components/LoadingSpinner';
+import { LayoutDashboard, ShoppingBag, Store, Users, Settings, LogOut, TrendingUp, ChevronRight, Download } from 'lucide-react';
 
 const ORDER_STATUSES = ['Pending', 'Preparing', 'Picked Up', 'Delivered', 'Cancelled'];
 // Hex values intentionally match design-system tokens so programmatic alpha suffixes (e.g. + '20') work
 // --warning: #DB7C0E | --info: #5D5FEF | --purple: #8B5CF6 | --success: #1BA672 | --danger: #E23744
 const STATUS_COLORS = { Pending: '#DB7C0E', Preparing: '#5D5FEF', 'Picked Up': '#8B5CF6', Delivered: '#1BA672', Cancelled: '#E23744' };
 
+const NAV_TABS = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'orders',    label: 'Orders',    icon: ShoppingBag },
+  { id: 'restaurants', label: 'Restaurants', icon: Store },
+  { id: 'users',     label: 'Users',     icon: Users },
+  { id: 'settings', label: 'Settings',  icon: Settings },
+];
+
 export default function AdminDashboard() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [restaurants, setRestaurants] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
@@ -760,61 +773,131 @@ export default function AdminDashboard() {
     );
   };
 
-  return (
-    <div style={styles.appContainer}>
-      <div style={styles.sidebar}>
-        <h2 style={styles.sidebarLogo}>Admin Panel</h2>
-        <nav style={styles.navMenu}>
-          {['dashboard', 'orders', 'restaurants', 'users', 'settings'].map(tab => (
-            <button
-              key={tab}
-              style={{...styles.navItem, ...(activeTab === tab ? styles.activeNavItem : {})}}
-              onClick={() => {
-                setActiveTab(tab);
-                setSelectedRestaurant(null);
-              }}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </nav>
-      </div>
+  const handleLogout = async () => {
+    try { await supabase.auth.signOut(); navigate('/login'); } catch (e) { console.error(e); }
+  };
 
+  return (
+    <div style={styles.appContainer} className="page-enter">
+      {/* ── Sidebar ── */}
+      <aside style={styles.sidebar}>
+        {/* Brand */}
+        <div style={styles.sidebarBrand}>
+          <img src="/images/logo.png" alt="FoodDash" style={{ width: '36px', height: '36px', borderRadius: '9px', objectFit: 'cover', flexShrink: 0 }} />
+          <div>
+            <div style={{ color: '#fff', fontWeight: 900, fontSize: '1.05rem', fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em' }}>FoodDash</div>
+            <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Admin Console</div>
+          </div>
+        </div>
+
+        {/* Nav Items */}
+        <nav style={styles.navMenu}>
+          {NAV_TABS.map(({ id, label, icon: Icon }) => {
+            const isActive = activeTab === id;
+            return (
+              <button
+                key={id}
+                style={{ ...styles.navItem, ...(isActive ? styles.activeNavItem : {}) }}
+                onClick={() => { setActiveTab(id); setSelectedRestaurant(null); }}
+              >
+                <div style={{ ...styles.navIconWrap, background: isActive ? 'rgba(226,55,68,0.2)' : 'transparent', border: isActive ? '1px solid rgba(226,55,68,0.3)' : '1px solid transparent' }}>
+                  <Icon size={16} color={isActive ? '#E23744' : 'rgba(255,255,255,0.45)'} />
+                </div>
+                <span>{label}</span>
+                {isActive && <ChevronRight size={14} color="rgba(255,255,255,0.3)" style={{ marginLeft: 'auto' }} />}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Bottom: user pill + logout */}
+        <div style={styles.sidebarFooter}>
+          <div style={styles.userPill}>
+            <div style={styles.userAvatar}>{user?.email?.[0]?.toUpperCase() || 'A'}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.82rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || 'Admin'}</div>
+              <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.68rem', fontWeight: 600 }}>Administrator</div>
+            </div>
+            <button onClick={handleLogout} title="Sign Out" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+              <LogOut size={15} color="rgba(255,255,255,0.45)" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* ── Main Content ── */}
       <div style={styles.mainContent}>
-        {renderContent()}
+        {/* Top Header Bar */}
+        <div style={styles.topBar}>
+          <div>
+            <h1 style={styles.pageTitle}>
+              {NAV_TABS.find(t => t.id === activeTab)?.label || 'Dashboard'}
+            </h1>
+            <p style={styles.pageSubtitle}>FoodDash Enterprise — Admin Console</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', background: '#f0fdf4', borderRadius: '20px', border: '1px solid #bbf7d0' }}>
+              <span className="status-dot-live" />
+              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#15803d' }}>LIVE</span>
+            </div>
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg,#e23744,#ff6b35)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: '0.85rem', boxShadow: '0 4px 12px rgba(226,55,68,0.3)' }}>
+              {user?.email?.[0]?.toUpperCase() || 'A'}
+            </div>
+          </div>
+        </div>
+
+        <div style={styles.contentArea}>
+          {renderContent()}
+        </div>
       </div>
     </div>
   );
 }
 
 const styles = {
-  appContainer: { display: 'flex', height: '100vh', fontFamily: 'Inter, sans-serif', background: 'var(--background)' },
-  sidebar: { width: '250px', background: 'var(--secondary)', color: 'white', display: 'flex', flexDirection: 'column', flexShrink: 0 },
-  sidebarLogo: { padding: '1.5rem', margin: 0, borderBottom: '1px solid var(--border)', fontSize: '1.4rem', fontWeight: '800', letterSpacing: '0.5px' },
-  navMenu: { display: 'flex', flexDirection: 'column', padding: '1.5rem 0' },
-  navItem: { padding: '1rem 1.5rem', background: 'none', border: 'none', color: 'var(--text-muted)', textAlign: 'left', fontSize: '1.05rem', cursor: 'pointer', transition: 'all 0.2s', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.8rem' },
-  activeNavItem: { background: 'var(--border)', color: 'var(--text-main)', borderLeft: '4px solid var(--primary)' },
-  mainContent: { flex: 1, padding: '2rem 3rem', overflowY: 'auto' },
-  header: { marginBottom: '2rem' },
-  title: { margin: 0, color: 'var(--text-main)', fontSize: '1.8rem', fontWeight: '800' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' },
-  analyticsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '2rem' },
-  panel: { background: 'var(--surface)', padding: '1.5rem', borderRadius: '12px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' },
-  form: { display: 'flex', flexDirection: 'column', gap: '1rem' },
-  input: { padding: '0.8rem', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '0.95rem', fontFamily: 'inherit', outline: 'none', transition: 'border-color 0.2s' },
-  primaryBtn: { padding: '0.8rem 1.5rem', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s' },
-  secondaryBtn: { padding: '0.6rem 1rem', background: 'var(--border)', color: 'var(--text-main)', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', transition: 'background 0.2s' },
-  list: { display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '500px', overflowY: 'auto', paddingRight: '0.5rem' },
-  card: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border)', padding: '1rem', borderRadius: '8px', background: 'var(--surface)', boxShadow: 'var(--shadow-sm)' },
-  thumb: { width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover' },
-  placeholderThumb: { width: '50px', height: '50px', borderRadius: '8px', background: 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' },
-  overviewGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '1rem' },
-  statCard: { background: 'var(--surface)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '1.2rem', boxShadow: 'var(--shadow-sm)' },
-  statIcon: { fontSize: '2rem', background: 'var(--background)', borderRadius: '50%', width: '70px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' },
-  statLabel: { margin: 0, color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' },
-  statValue: { margin: '0.3rem 0 0 0', fontSize: '1.8rem', color: 'var(--text-main)', fontWeight: '800' },
-  table: { width: '100%', borderCollapse: 'collapse', background: 'var(--surface)', margin: 0 },
-  th: { padding: '1.2rem 1rem', textAlign: 'left', borderBottom: '2px solid var(--border)', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.8px', background: 'var(--background)' },
-  td: { padding: '1rem', borderBottom: '1px solid var(--border)', color: 'var(--text-main)', fontSize: '0.95rem', verticalAlign: 'middle' },
-  badge: { padding: '0.3rem 0.8rem', borderRadius: '20px', fontWeight: '700', fontSize: '0.75rem', display: 'inline-block' }
+  /* Layout */
+  appContainer: { display: 'flex', height: '100vh', fontFamily: 'var(--font-body)', background: '#F0F2F7', overflow: 'hidden' },
+
+  /* Sidebar */
+  sidebar: { width: '248px', flexShrink: 0, background: '#0F1117', display: 'flex', flexDirection: 'column', borderRight: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' },
+  sidebarBrand: { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '1.3rem 1.2rem 1.2rem', borderBottom: '1px solid rgba(255,255,255,0.06)' },
+  navMenu: { display: 'flex', flexDirection: 'column', padding: '0.75rem 0.65rem', gap: '2px', flex: 1 },
+  navItem: { display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.7rem 0.85rem', background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', textAlign: 'left', fontSize: '0.88rem', cursor: 'pointer', transition: 'all 0.2s', fontWeight: 600, borderRadius: '10px', fontFamily: 'var(--font-body)' },
+  activeNavItem: { background: 'rgba(255,255,255,0.07)', color: '#ffffff', fontWeight: 700 },
+  navIconWrap: { width: '28px', height: '28px', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' },
+  sidebarFooter: { padding: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)' },
+  userPill: { display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.65rem 0.7rem', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' },
+  userAvatar: { width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg,#e23744,#ff6b35)', color: '#fff', fontWeight: 800, fontSize: '0.82rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+
+  /* Main Content */
+  mainContent: { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' },
+  topBar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 2rem', background: '#ffffff', borderBottom: '1px solid #E8E8EE', flexShrink: 0, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' },
+  pageTitle: { margin: 0, fontFamily: 'var(--font-heading)', fontSize: '1.45rem', fontWeight: 900, color: '#0F1117', letterSpacing: '-0.03em' },
+  pageSubtitle: { margin: '2px 0 0', fontSize: '0.78rem', color: '#8F9BB3', fontWeight: 500 },
+  contentArea: { flex: 1, padding: '1.75rem 2rem', overflowY: 'auto' },
+
+  /* Content */
+  header: { marginBottom: '1.5rem' },
+  title: { margin: 0, color: '#0F1117', fontSize: '1.5rem', fontWeight: 900, fontFamily: 'var(--font-heading)' },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '1.5rem' },
+  analyticsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.5rem' },
+  panel: { background: '#ffffff', padding: '1.5rem', borderRadius: '14px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E8E8EE' },
+  form: { display: 'flex', flexDirection: 'column', gap: '0.9rem' },
+  input: { padding: '0.75rem 0.9rem', border: '1.5px solid #E0E0EA', borderRadius: '10px', fontSize: '0.9rem', fontFamily: 'var(--font-body)', outline: 'none', transition: 'border-color 0.2s', color: '#0F1117', background: '#FAFBFF' },
+  primaryBtn: { padding: '0.75rem 1.5rem', background: 'linear-gradient(135deg,#E23744,#CB202D)', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-body)', fontSize: '0.88rem', boxShadow: '0 4px 12px rgba(226,55,68,0.25)' },
+  secondaryBtn: { padding: '0.6rem 1rem', background: '#F0F2F7', color: '#0F1117', border: '1.5px solid #E0E0EA', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-body)', fontSize: '0.85rem' },
+  backBtn: { display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1.5rem', padding: '0.6rem 1.2rem', background: '#F0F2F7', border: '1.5px solid #E0E0EA', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', color: '#0F1117', fontFamily: 'var(--font-body)' },
+  list: { display: 'flex', flexDirection: 'column', gap: '0.8rem', maxHeight: '500px', overflowY: 'auto', paddingRight: '0.3rem' },
+  card: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1.5px solid #E8E8EE', padding: '0.9rem 1rem', borderRadius: '12px', background: '#FAFBFF', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', transition: 'box-shadow 0.2s' },
+  thumb: { width: '48px', height: '48px', borderRadius: '10px', objectFit: 'cover' },
+  placeholderThumb: { width: '48px', height: '48px', borderRadius: '10px', background: '#F0F2F7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' },
+  overviewGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.2rem', marginBottom: '1.5rem' },
+  statCard: { background: '#ffffff', padding: '1.4rem 1.5rem', borderRadius: '14px', border: '1px solid #E8E8EE', display: 'flex', alignItems: 'center', gap: '1.1rem', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', transition: 'transform 0.2s, box-shadow 0.2s', cursor: 'default' },
+  statIcon: { fontSize: '1.6rem', background: '#F0F2F7', borderRadius: '12px', width: '52px', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  statLabel: { margin: 0, color: '#8F9BB3', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' },
+  statValue: { margin: '0.25rem 0 0 0', fontSize: '1.7rem', color: '#0F1117', fontWeight: 900, fontFamily: 'var(--font-heading)', letterSpacing: '-0.03em' },
+  table: { width: '100%', borderCollapse: 'collapse', background: '#ffffff', margin: 0 },
+  th: { padding: '1rem 1rem', textAlign: 'left', borderBottom: '2px solid #E8E8EE', color: '#8F9BB3', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', background: '#FAFBFF', whiteSpace: 'nowrap' },
+  td: { padding: '0.9rem 1rem', borderBottom: '1px solid #F0F2F7', color: '#0F1117', fontSize: '0.88rem', verticalAlign: 'middle' },
+  badge: { padding: '0.3rem 0.75rem', borderRadius: '20px', fontWeight: 700, fontSize: '0.72rem', display: 'inline-block', letterSpacing: '0.02em' }
 };
