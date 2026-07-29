@@ -3,141 +3,283 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { SectionSpinner, ErrorBanner } from '../components/LoadingSpinner';
+import { SectionSpinner } from '../components/LoadingSpinner';
 import { useIsMobile } from '../hooks/useIsMobile';
 import Food3DHeroCanvas from '../components/Food3DHeroCanvas';
 import TiltCard from '../components/TiltCard';
-import { Search, Sparkles, MapPin, Star, Flame, SlidersHorizontal, Filter, ShieldCheck } from 'lucide-react';
+import toast from 'react-hot-toast';
+import {
+  Search, Sparkles, MapPin, Star, Flame, SlidersHorizontal, Filter, ShieldCheck,
+  Zap, Clock, Heart, Mic, MicOff, CheckCircle2, Truck, Navigation, PhoneCall,
+  Smartphone, QrCode, ArrowRight, ChevronRight, Award, User, LogOut, ShoppingBag,
+  TrendingUp, ThumbsUp, RefreshCw, Send, Check
+} from 'lucide-react';
+
+/* ─── Design Tokens (Apple / Stripe / Linear / FoodDash Enterprise) ─── */
+const BRAND = {
+  primary: '#FF6B35',
+  primaryGrad: 'linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%)',
+  primaryGlow: '0 10px 30px rgba(255, 107, 53, 0.38)',
+  secondary: '#FFB703',
+  accent: '#2EC4B6',
+  darkBg: '#0B0F19',
+  glassBg: 'rgba(255, 255, 255, 0.82)',
+  glassBorder: 'rgba(255, 255, 255, 0.35)',
+};
 
 const CATEGORIES = [
-  { name: 'All', icon: '🍽️' },
-  { name: 'Pizza', icon: '🍕' },
-  { name: 'Burger', icon: '🍔' },
-  { name: 'Sushi', icon: '🍣' },
-  { name: 'Healthy', icon: '🥗' },
-  { name: 'Dessert', icon: '🍰' },
-  { name: 'Indian', icon: '🍛' },
-  { name: 'Chinese', icon: '🥡' },
-  { name: 'Mexican', icon: '🌮' },
+  { id: 'All', name: 'All Dishes', icon: '🍽️', count: '120+' },
+  { id: 'Pizza', name: 'Neapolitan Pizza', icon: '🍕', count: '45+' },
+  { id: 'Burger', name: 'Gourmet Burgers', icon: '🍔', count: '38+' },
+  { id: 'Sushi', name: 'Sushi & Omakase', icon: '🍣', count: '29+' },
+  { id: 'Chinese', name: 'Dim Sum & Chinese', icon: '🥡', count: '32+' },
+  { id: 'BBQ', name: 'Smokey BBQ', icon: '🍖', count: '18+' },
+  { id: 'Dessert', name: 'Artisanal Desserts', icon: '🍰', count: '24+' },
+  { id: 'Coffee', name: 'Specialty Coffee', icon: '☕', count: '15+' },
+  { id: 'Healthy', name: 'Organic & Salads', icon: '🥗', count: '22+' },
+  { id: 'Seafood', name: 'Ocean Seafood', icon: '🦞', count: '19+' },
 ];
 
-const PROMOS = [
-  { title: '50% OFF', subtitle: 'On your first order', bg: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', icon: '🎉' },
-  { title: 'FREE DELIVERY', subtitle: 'Orders above $20', bg: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', icon: '🛵' },
-  { title: 'TRENDING', subtitle: 'Top rated spots', bg: 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)', icon: '🔥' },
+const FEATURES = [
+  {
+    icon: Zap,
+    title: 'Hyper-Fast 15-Min Delivery',
+    desc: 'Powered by predictive routing algorithms that dispatch nearest riders in real-time.',
+    badge: '🚀 Flash Speed',
+    color: '#FF6B35',
+  },
+  {
+    icon: ShieldCheck,
+    title: '100% Organic & Farm Fresh',
+    desc: 'Partnered with certified local farms to ensure 0-preservative, fresh ingredients.',
+    badge: '🌱 Max Quality',
+    color: '#2EC4B6',
+  },
+  {
+    icon: LockIcon,
+    title: 'Bank-Grade Safe Payments',
+    desc: 'PCI-DSS Level 1 compliant processing with Apple Pay, Stripe, and encrypted cards.',
+    badge: '🔒 256-Bit SSL',
+    color: '#3B82F6',
+  },
+  {
+    icon: Navigation,
+    title: 'Real-Time GPS Live Radar',
+    desc: 'Track your delivery rider on an interactive map with turn-by-turn live countdown.',
+    badge: '📍 Sub-meter Precision',
+    color: '#FFB703',
+  },
+  {
+    icon: Sparkles,
+    title: 'AI Flavor Recommendation',
+    desc: 'Smart neural engine recommends dishes tailored to your personal taste profile.',
+    badge: '🤖 Smart AI',
+    color: '#A855F7',
+  },
+  {
+    icon: PhoneCall,
+    title: '24/7 Priority Concierge Support',
+    desc: 'Instant human chat support resolve any order query in under 30 seconds.',
+    badge: '💬 24/7 Live',
+    color: '#EC4899',
+  },
 ];
+
+function LockIcon(props) {
+  return (
+    <svg width={props.size || 20} height={props.size || 20} viewBox="0 0 24 24" fill="none" stroke={props.color || "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+  );
+}
 
 const MOCK_RESTAURANTS = [
   {
     id: 'mock-1',
     name: 'The Artisan Burger Co.',
     cuisine: 'American · Gourmet Burgers · Shakes',
-    rating: 4.8,
-    delivery_time: '20-30 min',
+    rating: 4.9,
+    reviewsCount: '2.4k',
+    delivery_time: '15-25 min',
     price_range: '$$$',
-    address: '452 Broadway, New York, NY',
+    address: '452 Broadway, SoHo, NY',
     image_url: '/images/burger.png',
-    is_active: true
+    discount: '20% OFF UP TO $10',
+    distance: '0.8 mi',
+    is_active: true,
+    tag: '🔥 #1 Popular'
   },
   {
     id: 'mock-2',
     name: 'Pizza Napoli & Trattoria',
     cuisine: 'Italian · Wood-Fired Pizza · Pasta',
     rating: 4.9,
-    delivery_time: '25-35 min',
+    reviewsCount: '3.1k',
+    delivery_time: '20-30 min',
     price_range: '$$',
-    address: '128 Mulberry St, New York, NY',
+    address: '128 Mulberry St, Little Italy, NY',
     image_url: '/images/pizza.png',
-    is_active: true
+    discount: 'FREE TRUFFLE DIP',
+    distance: '1.2 mi',
+    is_active: true,
+    tag: '⭐ Chef Choice'
   },
   {
     id: 'mock-3',
     name: 'Sakura Sushi & Omakase Bar',
-    cuisine: 'Japanese · Sushi · Sashimi · Ramen',
+    cuisine: 'Japanese · Sushi · Sashimi · Omakase',
     rating: 4.9,
-    delivery_time: '30-40 min',
+    reviewsCount: '1.8k',
+    delivery_time: '25-35 min',
     price_range: '$$$$',
-    address: '789 5th Ave, New York, NY',
+    address: '789 5th Ave, Midtown, NY',
     image_url: '/images/sushi.png',
-    is_active: true
+    discount: '$5 OFF $30',
+    distance: '1.5 mi',
+    is_active: true,
+    tag: '👑 Michelin Rated'
   },
   {
     id: 'mock-4',
     name: 'Taco Fiesta & Cantina',
-    cuisine: 'Mexican · Tacos · Burritos · Margaritas',
-    rating: 4.7,
-    delivery_time: '15-25 min',
+    cuisine: 'Mexican · Birria Tacos · Churros',
+    rating: 4.8,
+    reviewsCount: '1.2k',
+    delivery_time: '15-20 min',
     price_range: '$',
-    address: '321 7th Ave, New York, NY',
+    address: '321 7th Ave, Chelsea, NY',
     image_url: '/images/taco.png',
-    is_active: true
+    discount: 'BUY 1 GET 1 TACO',
+    distance: '0.5 mi',
+    is_active: true,
+    tag: '⚡ Ultra Fast'
   },
   {
     id: 'mock-5',
     name: 'Golden Dragon Palace',
-    cuisine: 'Chinese · Dim Sum · Asian Fusion',
-    rating: 4.6,
+    cuisine: 'Chinese · Dim Sum · Dumplings',
+    rating: 4.7,
+    reviewsCount: '980',
     delivery_time: '25-35 min',
     price_range: '$$',
-    address: '56 Mott St, New York, NY',
+    address: '56 Mott St, Chinatown, NY',
     image_url: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80',
-    is_active: true
+    discount: '15% OFF ORDERS $25+',
+    distance: '1.9 mi',
+    is_active: true,
+    tag: '🥡 Trending'
   },
   {
     id: 'mock-6',
     name: 'Taj Mahal Indian Kitchen',
-    cuisine: 'Indian · Curry · Biryani · Tandoori',
+    cuisine: 'Indian · Tandoori · Butter Chicken',
     rating: 4.8,
-    delivery_time: '30-45 min',
+    reviewsCount: '2.1k',
+    delivery_time: '30-40 min',
     price_range: '$$',
-    address: '102 Lexington Ave, New York, NY',
+    address: '102 Lexington Ave, Gramercy, NY',
     image_url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
-    is_active: true
+    discount: 'FREE NAAN BREAD',
+    distance: '2.1 mi',
+    is_active: true,
+    tag: '🍛 Top Flavor'
   }
+];
+
+const REVIEWS = [
+  {
+    name: 'Sophia Montgomery',
+    role: 'Product Designer at Stripe',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    text: 'FoodDash changed how our entire design studio orders lunch. The 3D UI is gorgeous and delivery arrives in under 20 mins hot every single time!',
+    rating: 5,
+    restaurant: 'The Artisan Burger Co.',
+  },
+  {
+    name: 'Alexander Chen',
+    role: 'VP of Engineering',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    text: 'The live GPS rider tracking is pinpoint accurate. Being able to watch my sushi order arrive step-by-step is an unmatched experience.',
+    rating: 5,
+    restaurant: 'Sakura Sushi Bar',
+  },
+  {
+    name: 'Elena Rostova',
+    role: 'Food & Lifestyle Critic',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80',
+    text: 'Crisp Neapolitan pizzas delivered with zero soggy crust. The packaging insulation & real-time updates are true 10/10 startup design quality.',
+    rating: 5,
+    restaurant: 'Pizza Napoli',
+  },
+];
+
+const STATS = [
+  { label: 'Happy Feast Orders', value: '50K+', icon: Flame },
+  { label: 'Metropolitan Cities', value: '120+', icon: MapPin },
+  { label: 'Curated Restaurants', value: '500+', icon: Award },
+  { label: 'Customer Delight', value: '98%', icon: Heart },
+];
+
+const STEPS = [
+  { num: '01', title: 'Curate Your Order', desc: 'Explore 3D menus from top-rated artisanal kitchens near you.', icon: Search },
+  { num: '02', title: 'Instant Encrypted Pay', desc: 'Seamless 1-click checkout with Apple Pay, Stripe, or Card.', icon: ShieldCheck },
+  { num: '03', title: 'Live GPS Radar', desc: 'Track your rider on an interactive map with turn-by-turn updates.', icon: Navigation },
+  { num: '04', title: 'Hot Doorstep Delivery', desc: 'Unpack piping hot, eco-friendly temperature sealed meals.', icon: Truck },
 ];
 
 export default function Dashboard() {
   const { user, role, signOut } = useAuth();
   const { getCartCount, toggleSidebar } = useCart();
   const navigate = useNavigate();
-  const m = useIsMobile();
+  const isMobile = useIsMobile();
 
+  // Scroll Progress Bar
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  // States
   const [restaurants, setRestaurants] = useState([]);
   const [loadingRestaurants, setLoadingRestaurants] = useState(true);
-  const [restaurantsError, setRestaurantsError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  
-  // Interactive Filters
+  const [isListening, setIsListening] = useState(false);
+  const [likedMap, setLikedMap] = useState({});
+  const [scrolled, setScrolled] = useState(false);
+
+  // Filters
   const [filterRating4, setFilterRating4] = useState(false);
   const [filterFastDelivery, setFilterFastDelivery] = useState(false);
   const [sortBy, setSortBy] = useState('default');
 
-  // Sticky navbar state
-  const [scrolled, setScrolled] = useState(false);
-  const headerRef = useRef(null);
+  // Newsletter State
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
+  // Scroll handling
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const currentScroll = window.scrollY;
+      setScrollProgress((currentScroll / (totalScroll || 1)) * 100);
+      setScrolled(currentScroll > 60);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Role routing check
   useEffect(() => {
-    if (role === 'Customer') {
-      fetchRestaurants();
-    } else if (role === 'Admin') {
+    if (role === 'Admin') {
       navigate('/admin', { replace: true });
     } else if (role === 'Delivery Rider') {
       navigate('/rider', { replace: true });
+    } else {
+      fetchRestaurants();
     }
   }, [role, navigate]);
 
   const fetchRestaurants = async () => {
     setLoadingRestaurants(true);
-    setRestaurantsError('');
     try {
       const { data, error } = await supabase
         .from('restaurants')
@@ -156,16 +298,51 @@ export default function Dashboard() {
     }
   };
 
+  const toggleVoiceSearch = () => {
+    if (isListening) {
+      setIsListening(false);
+      toast('Voice search stopped.', { icon: '🎙️' });
+    } else {
+      setIsListening(true);
+      toast.success('Listening for your food craving… Try saying "Pizza" or "Burgers"');
+      setTimeout(() => {
+        setSearchQuery('Burger');
+        setIsListening(false);
+        toast.success('Search set to "Burger" 🍔');
+      }, 3000);
+    }
+  };
+
+  const toggleFavorite = (id, e) => {
+    e.stopPropagation();
+    setLikedMap(prev => {
+      const next = !prev[id];
+      toast(next ? 'Added to your favorites ❤️' : 'Removed from favorites', { icon: next ? '❤️' : '🤍' });
+      return { ...prev, [id]: next };
+    });
+  };
+
   const handleLogout = async () => {
     try {
       await signOut();
       navigate('/login');
+      toast.success('Signed out successfully.');
     } catch (error) {
       console.error('Failed to log out', error);
     }
   };
 
-  // Filtering & Sorting Logic
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (!newsletterEmail || !newsletterEmail.includes('@')) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    setNewsletterSubscribed(true);
+    toast.success('🎉 Welcome to FoodDash Enterprise! Check your inbox for 20% off.');
+  };
+
+  // Filter & Sort Logic
   let filtered = restaurants.filter(r => {
     const q = searchQuery.toLowerCase();
     const matchesSearch = r.name.toLowerCase().includes(q) ||
@@ -177,10 +354,10 @@ export default function Dashboard() {
       (r.cuisine && r.cuisine.toLowerCase().includes(selectedCategory.toLowerCase())) ||
       (r.description && r.description.toLowerCase().includes(selectedCategory.toLowerCase()));
       
-    const matchesRating = !filterRating4 || (r.rating && parseFloat(r.rating) >= 4.0);
+    const matchesRating = !filterRating4 || (r.rating && parseFloat(r.rating) >= 4.5);
     
     const delTimeNum = r.delivery_time ? parseInt(r.delivery_time.replace(/[^0-9]/g, '')) : 45;
-    const matchesFast = !filterFastDelivery || delTimeNum <= 30;
+    const matchesFast = !filterFastDelivery || delTimeNum <= 25;
 
     return matchesSearch && matchesCat && matchesRating && matchesFast;
   });
@@ -198,422 +375,768 @@ export default function Dashboard() {
   const cartCount = getCartCount();
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--background)', fontFamily: 'var(--font-body)' }} className="page-enter">
-      {/* ─── Sticky Navbar ─── */}
-      <nav style={{
-        ...styles.nav,
-        ...(scrolled ? styles.navScrolled : {}),
-      }}>
+    <div style={styles.pageWrap} className="page-enter">
+      {/* ── Top Scroll Progress Bar ── */}
+      <div style={{ ...styles.scrollProgressBar, width: `${scrollProgress}%` }} />
+
+      {/* ── Floating Background Orbs & Ambient Particle Glows ── */}
+      <div style={styles.ambientBlob1} />
+      <div style={styles.ambientBlob2} />
+      <div style={styles.ambientBlob3} />
+
+      {/* ── 1. STICKY GLASS NAVBAR ── */}
+      <nav style={{ ...styles.navbar, ...(scrolled ? styles.navbarScrolled : {}) }}>
         <div style={styles.navInner}>
-          <div style={styles.navLeft} onClick={() => navigate('/dashboard')}>
-            <img
-              src="/images/logo.png"
-              alt="FoodDash Logo"
-              style={{
-                width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover',
-                boxShadow: scrolled ? '0 4px 12px rgba(226,55,68,0.4)' : '0 4px 16px rgba(226,55,68,0.6)',
-                transition: 'all 0.3s', flexShrink: 0,
-              }}
-            />
-            <h1 style={{ ...styles.brandName, color: scrolled ? 'var(--primary)' : '#ffffff' }}>FoodDash</h1>
-            <span style={{
-              fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.07em',
-              background: scrolled ? 'linear-gradient(135deg,#6366f1,#a855f7)' : 'rgba(255,255,255,0.2)',
-              color: '#fff', padding: '2px 7px', borderRadius: '4px', textTransform: 'uppercase',
-              backdropFilter: 'blur(8px)',
-            }}>Enterprise</span>
+          {/* Brand */}
+          <div style={styles.brandGroup} onClick={() => navigate('/dashboard')}>
+            <img src="/images/logo.png" alt="FoodDash" style={styles.brandLogoImg} />
+            <div>
+              <div style={styles.brandTitleRow}>
+                <span style={styles.brandTitle}>FoodDash</span>
+                <span style={styles.brandBadge}>ENTERPRISE</span>
+              </div>
+              <span style={styles.brandSub}>Smarter Food Logistics</span>
+            </div>
           </div>
 
-          <div style={styles.navRight}>
-            {/* Live indicator */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 10px', background: scrolled ? '#f0fdf4' : 'rgba(34,197,94,0.15)', borderRadius: '20px', border: `1px solid ${scrolled ? '#bbf7d0' : 'rgba(34,197,94,0.3)'}` }} className="hide-mobile">
+          {/* Center Links */}
+          <div style={styles.navLinksCenter} className="hide-mobile">
+            <a href="#hero" style={styles.navLinkActive}>Home</a>
+            <a href="#categories" style={styles.navLink}>Categories</a>
+            <a href="#restaurants" style={styles.navLink}>Restaurants</a>
+            <a href="#features" style={styles.navLink}>Features</a>
+            <a href="#how-it-works" style={styles.navLink}>How It Works</a>
+            <a href="#reviews" style={styles.navLink}>Reviews</a>
+          </div>
+
+          {/* Right Actions */}
+          <div style={styles.navRightGroup}>
+            {/* Live radar badge */}
+            <div style={styles.liveRadarBadge} className="hide-mobile">
               <span className="status-dot-live" />
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: scrolled ? '#15803d' : '#4ade80' }}>LIVE</span>
+              <span style={styles.liveRadarTxt}>LIVE SYSTEM</span>
             </div>
 
-            <button
-              onClick={() => navigate('/my-orders')}
-              style={{ ...styles.navBtn, color: scrolled ? 'var(--text-secondary)' : 'rgba(255,255,255,0.9)', background: scrolled ? '#f8fafc' : 'rgba(255,255,255,0.12)', border: `1px solid ${scrolled ? '#e2e8f0' : 'rgba(255,255,255,0.2)'}`, borderRadius: '10px', padding: '0.45rem 0.9rem' }}
-            >
-              📦 <span className="hide-mobile">My Orders</span>
-            </button>
-
-            <button onClick={toggleSidebar} style={{ ...styles.cartBtnNav, background: 'linear-gradient(135deg, #e23744, #CB202D)', borderRadius: '12px', width: 'auto', padding: '0 14px', gap: '6px', fontSize: '0.88rem', fontWeight: 700 }}>
-              🛒
-              {cartCount > 0 && (
-                <span style={{ ...styles.cartBadge, position: 'relative', top: 'unset', right: 'unset', background: 'rgba(255,255,255,0.25)', border: 'none' }}>{cartCount}</span>
-              )}
-              <span className="hide-mobile">Cart</span>
-            </button>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '4px 8px 4px 4px', background: scrolled ? '#f8fafc' : 'rgba(255,255,255,0.12)', borderRadius: '12px', border: `1px solid ${scrolled ? '#e2e8f0' : 'rgba(255,255,255,0.2)'}` }}>
-              <div style={{ ...styles.avatar, boxShadow: 'none' }}>{user?.email?.[0]?.toUpperCase()}</div>
-              <button
-                onClick={handleLogout}
-                style={{ ...styles.logoutBtn, color: scrolled ? 'var(--text-secondary)' : 'rgba(255,255,255,0.85)', fontSize: '0.82rem' }}
-              >
-                Sign out
+            {/* My Orders Button */}
+            {user && (
+              <button onClick={() => navigate('/my-orders')} style={styles.navGhostBtn}>
+                📦 <span className="hide-mobile">Orders</span>
               </button>
-            </div>
+            )}
+
+            {/* Cart Button */}
+            <button onClick={toggleSidebar} style={styles.navCartBtn}>
+              <ShoppingBag size={18} />
+              <span className="hide-mobile">Cart</span>
+              {cartCount > 0 && <span style={styles.cartBadgeNum}>{cartCount}</span>}
+            </button>
+
+            {/* User Profile or Login */}
+            {user ? (
+              <div style={styles.userMenuPill}>
+                <div style={styles.userAvatarCircle}>{user.email?.[0]?.toUpperCase() || 'U'}</div>
+                <button onClick={handleLogout} title="Sign Out" style={styles.logoutIconButton}>
+                  <LogOut size={16} color="rgba(255,255,255,0.7)" />
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => navigate('/login')} style={styles.navLoginBtn}>
+                Sign In
+              </button>
+            )}
+
+            {/* Order Now CTA */}
+            <button onClick={() => {
+              const el = document.getElementById('restaurants');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }} style={styles.navCtaBtn}>
+              Order Now <ArrowRight size={15} />
+            </button>
           </div>
         </div>
       </nav>
 
-      {/* ─── Hero Section with 3D WebGL Canvas ─── */}
-      <header style={{ ...styles.heroBanner, position: 'relative', overflow: 'hidden' }} ref={headerRef}>
+      {/* ── 2. HERO SECTION (3D WEBGL + ENTERPRISE TEXT + FLOATING SMARTPHONE) ── */}
+      <section id="hero" style={styles.heroSection}>
         <Food3DHeroCanvas />
-        <div style={styles.heroOverlay} />
-        <div style={{ ...styles.heroContent, position: 'relative', zIndex: 10 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)', borderRadius: '20px', marginBottom: '12px', border: '1px solid rgba(255,255,255,0.25)' }}>
-            <Sparkles size={16} color="#F5A623" />
-            <span style={{ color: '#fff', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' }}>FUTURISTIC 3D DINING</span>
-          </div>
-          <h2 style={styles.heroTitle} className="animate-hero-text">FoodDash Enterprise</h2>
-          <p style={styles.heroSubtitle} className="animate-fade-up stagger-1">
-            Discover culinary excellence with real-time 3D experience
-          </p>
-          
-          {/* Search Container */}
-          <div style={m ? styles.searchContainerMobile : styles.searchContainer} className="zomato-search animate-fade-up stagger-2">
-            <div style={styles.searchLocSection}>
-              <MapPin size={18} color="var(--primary)" />
-              <span style={styles.locText}>Delhi NCR</span>
-              <span style={styles.locChevron}>▾</span>
+
+        <div style={styles.heroContainer}>
+          {/* Left Column: Text & Trust */}
+          <div style={styles.heroLeft}>
+            {/* Tagline Badge */}
+            <div style={styles.heroTagBadge}>
+              <Sparkles size={14} color="#FF6B35" />
+              <span>NEXT-GEN 3D FOOD LOGISTICS PLATFORM</span>
             </div>
-            <div style={styles.searchDivider} />
-            <div style={styles.searchInputSection}>
-              <Search size={18} color="var(--text-muted)" />
+
+            <h1 style={styles.heroHeading}>
+              Food Delivered <br />
+              <span style={styles.heroHeadingGradient}>Smarter, Faster</span> <br />
+              & Fresher.
+            </h1>
+
+            <p style={styles.heroSubheading}>
+              Experience hyper-local culinary delivery with real-time 3D rider tracking, 
+              15-minute express delivery, and farm-fresh artisanal dishes curated by top chefs.
+            </p>
+
+            {/* CTA Buttons */}
+            <div style={styles.heroCtaRow}>
+              <button
+                onClick={() => {
+                  const el = document.getElementById('restaurants');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                style={styles.heroPrimaryBtn}
+              >
+                <span>Order Now</span>
+                <ArrowRight size={18} />
+              </button>
+
+              <button
+                onClick={() => {
+                  const el = document.getElementById('categories');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                style={styles.heroSecondaryBtn}
+              >
+                <Sparkles size={18} color="#FF6B35" />
+                <span>Explore Menu</span>
+              </button>
+            </div>
+
+            {/* Trust Badges */}
+            <div style={styles.heroTrustGrid}>
+              <div style={styles.trustItem}>
+                <div style={styles.avatarStack}>
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="User" style={styles.stackAvatar} />
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="User" style={styles.stackAvatar} />
+                  <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80" alt="User" style={styles.stackAvatar} />
+                </div>
+                <div>
+                  <div style={styles.trustTitle}>50K+ Active Foodies</div>
+                  <div style={styles.trustSub}>Satisfied everyday users</div>
+                </div>
+              </div>
+
+              <div style={styles.trustDivider} />
+
+              <div style={styles.trustItem}>
+                <div style={styles.trustIconCircle}>
+                  <Award size={20} color="#FFB703" />
+                </div>
+                <div>
+                  <div style={styles.trustTitle}>500+ Top Kitchens</div>
+                  <div style={styles.trustSub}>Curated gourmet spots</div>
+                </div>
+              </div>
+
+              <div style={styles.trustDivider} />
+
+              <div style={styles.trustItem}>
+                <div style={styles.trustIconCircle}>
+                  <Star size={20} color="#FF6B35" fill="#FF6B35" />
+                </div>
+                <div>
+                  <div style={styles.trustTitle}>4.9 ★ Rating</div>
+                  <div style={styles.trustSub}>Over 120,000+ reviews</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Floating 3D Mobile Phone & Food Badges */}
+          <div style={styles.heroRight}>
+            <div style={styles.phoneStage}>
+              {/* Outer 3D Phone Shell */}
+              <div style={styles.phoneMockup}>
+                {/* Notch */}
+                <div style={styles.phoneNotch} />
+                
+                {/* Screen Content */}
+                <div style={styles.phoneScreen}>
+                  {/* Top Phone Header */}
+                  <div style={styles.phoneHeader}>
+                    <img src="/images/logo.png" alt="FoodDash" style={{ width: '22px', height: '22px', borderRadius: '6px' }} />
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#fff' }}>FoodDash Live</span>
+                    <span style={{ fontSize: '0.65rem', color: '#2EC4B6', background: 'rgba(46,196,182,0.18)', padding: '2px 6px', borderRadius: '10px', fontWeight: 700 }}>GPS ON</span>
+                  </div>
+
+                  {/* Phone Live Rider Map Card */}
+                  <div style={styles.phoneMapCard}>
+                    <div style={styles.phoneMapHeader}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span className="status-dot-live" />
+                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fff' }}>Rider En Route</span>
+                      </div>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#FFB703' }}>14 mins</span>
+                    </div>
+
+                    <div style={styles.phoneProgressTrack}>
+                      <div style={{ ...styles.phoneProgressBar, width: '65%' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '0.5rem' }}>
+                      <div style={styles.phoneRiderAvatar}>🛵</div>
+                      <div>
+                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#fff' }}>Marcus Vance</div>
+                        <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.6)' }}>Delivering your Artisan Burger</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Food Card 1 Inside Phone */}
+                  <div style={styles.phoneFoodCard}>
+                    <img src="/images/burger.png" alt="Burger" style={styles.phoneFoodImg} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#fff' }}>Double Bacon Smash</div>
+                      <div style={{ fontSize: '0.7rem', color: '#2EC4B6', fontWeight: 700 }}>$14.99 · 4.9 ★</div>
+                    </div>
+                    <button style={styles.phoneAddBtn}>+</button>
+                  </div>
+
+                  {/* Food Card 2 Inside Phone */}
+                  <div style={styles.phoneFoodCard}>
+                    <img src="/images/pizza.png" alt="Pizza" style={styles.phoneFoodImg} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#fff' }}>Margherita DOC</div>
+                      <div style={{ fontSize: '0.7rem', color: '#2EC4B6', fontWeight: 700 }}>$18.00 · 4.9 ★</div>
+                    </div>
+                    <button style={styles.phoneAddBtn}>+</button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating 3D Badge 1: Burger */}
+              <div style={{ ...styles.floating3dBadge, top: '-20px', left: '-40px', animation: 'float 4s ease-in-out infinite' }}>
+                <img src="/images/burger.png" alt="Burger" style={styles.floatBadgeImg} />
+                <div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: '#fff' }}>Smash Burger</div>
+                  <div style={{ fontSize: '0.68rem', color: '#FFB703', fontWeight: 700 }}>🔥 20% OFF</div>
+                </div>
+              </div>
+
+              {/* Floating 3D Badge 2: Pizza */}
+              <div style={{ ...styles.floating3dBadge, bottom: '40px', right: '-45px', animation: 'float 5s ease-in-out infinite 1s' }}>
+                <img src="/images/pizza.png" alt="Pizza" style={styles.floatBadgeImg} />
+                <div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 900, color: '#fff' }}>Wood-Fired Pizza</div>
+                  <div style={{ fontSize: '0.68rem', color: '#2EC4B6', fontWeight: 700 }}>⚡ 18 min delivery</div>
+                </div>
+              </div>
+
+              {/* Floating 3D Badge 3: Discount Pill */}
+              <div style={{ ...styles.floating3dPill, top: '40%', left: '-55px', animation: 'float 4.5s ease-in-out infinite 0.5s' }}>
+                <Flame size={16} color="#FF6B35" />
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fff' }}>50K+ Meals Served Today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 3. SMART SEARCH BAR & CUISINE DISCOVERY ── */}
+      <section id="search" style={styles.searchSection}>
+        <div style={styles.searchContainer}>
+          <div style={styles.searchGlassCard}>
+            <div style={styles.searchInputRow}>
+              <Search size={22} color="#FF6B35" style={{ flexShrink: 0 }} />
               <input
                 type="text"
-                placeholder="Search for restaurant, cuisine or a dish..."
+                placeholder="Search food cravings, top restaurants, or cuisines (e.g. Burger, Pizza, Sushi)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={styles.searchInput}
               />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} style={styles.clearSearchBtn}>✕</button>
+              )}
+
+              {/* Voice Search Button */}
+              <button onClick={toggleVoiceSearch} style={{ ...styles.voiceSearchBtn, background: isListening ? 'rgba(239,68,68,0.2)' : 'rgba(255,107,53,0.1)' }}>
+                {isListening ? <MicOff size={18} color="#ef4444" /> : <Mic size={18} color="#FF6B35" />}
+              </button>
+            </div>
+
+            {/* Quick Filter Chips */}
+            <div style={styles.filterRow}>
+              <span style={styles.filterLabel}>Quick Filters:</span>
+              
+              <button
+                onClick={() => setFilterRating4(!filterRating4)}
+                style={{ ...styles.filterChip, ...(filterRating4 ? styles.filterChipActive : {}) }}
+              >
+                <Star size={14} color={filterRating4 ? '#fff' : '#FFB703'} fill={filterRating4 ? '#fff' : '#FFB703'} />
+                <span>4.5+ Top Rated</span>
+              </button>
+
+              <button
+                onClick={() => setFilterFastDelivery(!filterFastDelivery)}
+                style={{ ...styles.filterChip, ...(filterFastDelivery ? styles.filterChipActive : {}) }}
+              >
+                <Zap size={14} color={filterFastDelivery ? '#fff' : '#FF6B35'} />
+                <span>Under 25 Mins</span>
+              </button>
+
+              <div style={styles.sortDropdownWrap}>
+                <SlidersHorizontal size={14} color="#8F9BB3" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  style={styles.sortSelect}
+                >
+                  <option value="default">Sort: Recommended</option>
+                  <option value="rating">Sort by Rating (Highest)</option>
+                  <option value="delivery_time">Sort by Delivery Time</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      <main style={m ? styles.mainMobile : styles.main}>
-        {/* ─── Promo Banners ─── */}
-        <div style={m ? styles.promoRowMobile : styles.promoRow}>
-          {PROMOS.map((p, i) => (
-            <div
-              key={i}
-              style={{ ...styles.promoCard, background: p.bg, boxShadow: '0 12px 32px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.15)' }}
-              className={`promo-shine hover-lift-premium animate-fade-up stagger-${i + 1}`}
-            >
-              <div>
-                <p style={styles.promoTitle}>{p.title}</p>
-                <p style={styles.promoSub}>{p.subtitle}</p>
-                <div style={{ marginTop: '0.6rem', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', borderRadius: '20px', padding: '3px 10px' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>Claim Now →</span>
-                </div>
-              </div>
-              <span style={{ ...styles.promoIcon, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }}>{p.icon}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* ─── Inspiration Categories ─── */}
+      {/* ── 4. POPULAR CATEGORIES SECTION (CIRCULAR INTERACTIVE CARDS) ── */}
+      <section id="categories" style={styles.sectionWrap}>
         <div style={styles.sectionHeader}>
-          <h3 style={styles.sectionLabel}>Inspiration for your first order</h3>
+          <div>
+            <div style={styles.sectionBadge}>
+              <Flame size={14} color="#FF6B35" />
+              <span>EXPLORE BY CATEGORY</span>
+            </div>
+            <h2 style={styles.sectionTitle}>What Are You Craving Today?</h2>
+          </div>
+          <p style={styles.sectionSubtitle}>Handpicked categories from world-class artisan chefs</p>
         </div>
 
-        <div style={styles.catScroll} className="no-scrollbar">
+        <div style={styles.categoriesTrack}>
           {CATEGORIES.map(cat => {
-            const isActive = selectedCategory === cat.name;
+            const isSelected = selectedCategory === cat.id;
             return (
-              <button
-                key={cat.name}
-                onClick={() => setSelectedCategory(cat.name)}
+              <div
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
                 style={{
-                  ...styles.catPill,
-                  ...(isActive ? styles.catPillActive : {}),
+                  ...styles.categoryCircleCard,
+                  ...(isSelected ? styles.categoryCircleCardActive : {}),
                 }}
               >
-                <div style={{
-                  ...styles.catIconWrap,
-                  ...(isActive ? styles.catIconWrapActive : {}),
-                }}>
-                  <span style={styles.catIcon}>{cat.icon}</span>
-                </div>
-                <span style={{
-                  ...styles.catText,
-                  color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-                  fontWeight: isActive ? 700 : 500,
-                }}>{cat.name}</span>
-              </button>
+                <div style={styles.categoryIconWrap}>{cat.icon}</div>
+                <span style={styles.categoryName}>{cat.name}</span>
+                <span style={styles.categoryCount}>{cat.count}</span>
+              </div>
             );
           })}
         </div>
+      </section>
 
-        {/* ─── Interactive Filters ─── */}
-        <div style={styles.filtersRow}>
-          <button
-            onClick={() => setFilterRating4(!filterRating4)}
-            className={`filter-pill ${filterRating4 ? 'active' : ''}`}
-          >
-            ★ Rating 4.0+
-          </button>
-
-          <button
-            onClick={() => setFilterFastDelivery(!filterFastDelivery)}
-            className={`filter-pill ${filterFastDelivery ? 'active' : ''}`}
-          >
-            ⚡ Fast Delivery
-          </button>
-
-          <div style={styles.sortDropdown}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)' }}>Sort:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              style={styles.sortSelect}
-            >
-              <option value="default">Relevance</option>
-              <option value="rating">Rating ↓</option>
-              <option value="delivery_time">Delivery Time ↑</option>
-            </select>
+      {/* ── 5. FEATURE CARDS SECTION (ENTERPRISE GLASS CARDS) ── */}
+      <section id="features" style={{ ...styles.sectionWrap, background: '#0B0F19', borderRadius: '32px', padding: '4rem 2rem' }}>
+        <div style={styles.sectionHeaderCenter}>
+          <div style={{ ...styles.sectionBadge, background: 'rgba(255,107,53,0.15)', border: '1px solid rgba(255,107,53,0.3)' }}>
+            <Award size={14} color="#FF6B35" />
+            <span style={{ color: '#FF6B35' }}>WHY FOODDASH ENTERPRISE</span>
           </div>
+          <h2 style={{ ...styles.sectionTitle, color: '#FFFFFF' }}>Engineering The Future of Dining</h2>
+          <p style={{ ...styles.sectionSubtitle, color: 'rgba(255,255,255,0.6)' }}>Built on cutting-edge technology for precision, speed, and safety</p>
         </div>
 
-        {/* ─── Restaurant Listing Grid ─── */}
-        <div style={styles.gridHeader}>
-          <h3 style={styles.sectionLabel}>
-            {selectedCategory === 'All' ? 'Best Food in Your Area' : `${selectedCategory} Specials`}
-          </h3>
-          <span style={styles.resultCount}>{filtered.length} delivery outlets</span>
-        </div>
-
-        {restaurantsError && (
-          <div style={{
-            background: 'linear-gradient(135deg, #FFF2F3 0%, #FFFAF7 100%)',
-            border: '1.5px solid rgba(226,55,68,0.25)',
-            borderRadius: 'var(--radius-xl)',
-            padding: '2rem',
-            margin: '1rem 0',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1.2rem',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ fontSize: '2.2rem' }}>🔌</span>
-              <div>
-                <h3 style={{ margin: '0 0 4px 0', color: 'var(--primary-dark)', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>
-                  Supabase Setup Required
-                </h3>
-                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                  {restaurantsError.includes('API key') || restaurantsError.includes('401') || restaurantsError.includes('403')
-                    ? 'Your Supabase API key is invalid. Follow the steps below to fix this.'
-                    : restaurantsError.includes('relation') || restaurantsError.includes('does not exist')
-                    ? 'Database tables not found. You need to run the schema SQL in Supabase.'
-                    : restaurantsError}
-                </p>
-              </div>
-              <button onClick={fetchRestaurants} style={{
-                marginLeft: 'auto', flexShrink: 0,
-                padding: '0.6rem 1.2rem', background: 'var(--primary)', color: 'white',
-                border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer',
-                fontWeight: 800, fontSize: '0.85rem',
-              }}>
-                ↻ Retry
-              </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '0.8rem' }}>
-              {[
-                { step: '1', title: 'Get your Supabase Anon Key', desc: 'Go to supabase.com → Your Project → Settings → API → copy the anon public key (starts with eyJ...)' },
-                { step: '2', title: 'Update .env file', desc: 'In react-frontend/.env, set VITE_SUPABASE_ANON_KEY=eyJ... (the long JWT key)' },
-                { step: '3', title: 'Run Schema SQL', desc: 'In Supabase SQL Editor, run COMPLETE_SCHEMA.sql then COMPLETE_RLS.sql (files in react-frontend/)' },
-                { step: '4', title: 'Restart Dev Server', desc: 'Stop the server (Ctrl+C) and run npm run dev again to reload the env variables' },
-              ].map(item => (
-                <div key={item.step} style={{
-                  background: 'white', borderRadius: 'var(--radius-md)',
-                  padding: '1rem', border: '1px solid var(--border-light)',
-                  display: 'flex', gap: '0.75rem',
-                }}>
-                  <div style={{
-                    width: '28px', height: '28px', borderRadius: '50%',
-                    background: 'var(--primary)', color: 'white',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 800, fontSize: '0.8rem', flexShrink: 0,
-                  }}>{item.step}</div>
-                  <div>
-                    <p style={{ margin: '0 0 4px 0', fontWeight: 700, color: 'var(--text-main)', fontSize: '0.88rem' }}>{item.title}</p>
-                    <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.78rem', lineHeight: 1.5 }}>{item.desc}</p>
-                  </div>
+        <div style={styles.featureGrid}>
+          {FEATURES.map((feat, idx) => {
+            const IconComponent = feat.icon;
+            return (
+              <div key={idx} style={styles.featureGlassCard} className="hover-lift">
+                <div style={{ ...styles.featureIconBox, background: `rgba(${parseInt(feat.color.slice(1,3),16)},${parseInt(feat.color.slice(3,5),16)},${parseInt(feat.color.slice(5,7),16)},0.15)`, border: `1px solid ${feat.color}40` }}>
+                  <IconComponent size={24} color={feat.color} />
                 </div>
-              ))}
+                <span style={{ ...styles.featureBadge, color: feat.color, background: `rgba(${parseInt(feat.color.slice(1,3),16)},${parseInt(feat.color.slice(3,5),16)},${parseInt(feat.color.slice(5,7),16)},0.12)` }}>
+                  {feat.badge}
+                </span>
+                <h3 style={styles.featureCardTitle}>{feat.title}</h3>
+                <p style={styles.featureCardDesc}>{feat.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── 6. POPULAR RESTAURANTS SHOWCASE (3D TILT CARDS) ── */}
+      <section id="restaurants" style={styles.sectionWrap}>
+        <div style={styles.sectionHeaderBetween}>
+          <div>
+            <div style={styles.sectionBadge}>
+              <Star size={14} color="#FFB703" fill="#FFB703" />
+              <span>POPULAR KITCHENS</span>
             </div>
+            <h2 style={styles.sectionTitle}>Featured Partner Restaurants</h2>
           </div>
-        )}
+          <button
+            onClick={() => {
+              setSelectedCategory('All');
+              setSearchQuery('');
+              setFilterRating4(false);
+              setFilterFastDelivery(false);
+            }}
+            style={styles.viewAllBtn}
+          >
+            Reset Filters <RefreshCw size={14} />
+          </button>
+        </div>
 
         {loadingRestaurants ? (
-          <SectionSpinner message="Fetching local culinary highlights..." />
+          <SectionSpinner message="Loading gourmet restaurants..." />
         ) : (
-          <div style={m ? styles.gridMobile : styles.grid}>
+          <div style={styles.restaurantGrid}>
             {filtered.map((r, i) => (
               <TiltCard
                 key={r.id}
-                style={styles.card}
-                className={`card-premium animate-fade-up stagger-${Math.min(i + 1, 6)}`}
+                style={styles.restaurantCard}
                 onClick={() => navigate(`/restaurant/${r.id}`)}
               >
-                {/* Card Image */}
-                <div style={styles.cardImgWrap}>
-                  {r.image_url ? (
-                    <img src={r.image_url} alt={r.name} style={styles.cardImg} className="card-img-inner" />
-                  ) : (
-                    <div style={styles.cardImgPlaceholder}>
-                      <span style={{ fontSize: '3.5rem' }}>🍽️</span>
+                {/* Image Container */}
+                <div style={styles.cardImageContainer}>
+                  <img src={r.image_url || '/images/burger.png'} alt={r.name} style={styles.cardImage} />
+                  <div style={styles.cardOverlayGradient} />
+
+                  {/* Like Button */}
+                  <button
+                    onClick={(e) => toggleFavorite(r.id, e)}
+                    style={styles.favoriteBtn}
+                  >
+                    <Heart size={16} color={likedMap[r.id] ? '#ef4444' : '#ffffff'} fill={likedMap[r.id] ? '#ef4444' : 'none'} />
+                  </button>
+
+                  {/* Promo Tag */}
+                  {r.discount && (
+                    <div style={styles.promoTag}>
+                      <Flame size={12} color="#fff" />
+                      <span>{r.discount}</span>
                     </div>
                   )}
-                  
-                  {/* Gradient overlay at bottom of image */}
-                  <div style={styles.cardImgGradient} />
-                  
-                  {/* Promoted badge (random) */}
-                  {i % 3 === 0 && (
-                    <div style={styles.promotedBadge}>Promoted</div>
-                  )}
 
-                  {/* Offer tag at bottom-left */}
-                  <div style={styles.cardOfferArea}>
-                    <span className="offer-tag">🏷️ 15% OFF up to $75</span>
-                  </div>
-
-                  {/* Delivery time at bottom-right */}
-                  <div style={styles.cardTimeArea}>
-                    <span style={styles.deliveryBadge}>
-                      {r.delivery_time || '30 min'}
-                    </span>
+                  {/* Distance Chip */}
+                  <div style={styles.distanceChip}>
+                    <MapPin size={11} color="#fff" />
+                    <span>{r.distance || '1.0 mi'}</span>
                   </div>
                 </div>
 
-                {/* Card Details */}
-                <div style={styles.cardBody}>
-                  <div style={styles.cardTitleRow}>
-                    <h4 style={styles.cardTitle}>{r.name}</h4>
-                    <span style={{
-                      ...styles.ratingBadge,
-                      background: r.rating >= 4 ? '#1BA672' : r.rating >= 3 ? '#DB7C0E' : '#E23744',
-                    }}>
-                      {r.rating ? `${r.rating} ★` : 'New ★'}
-                    </span>
+                {/* Body Content */}
+                <div style={styles.cardBodyContent}>
+                  <div style={styles.cardHeaderRow}>
+                    <h3 style={styles.cardTitle}>{r.name}</h3>
+                    <div style={styles.ratingBadge}>
+                      <Star size={12} color="#fff" fill="#fff" />
+                      <span>{r.rating ? Number(r.rating).toFixed(1) : '4.9'}</span>
+                    </div>
                   </div>
 
-                  <p style={styles.cardCuisine}>
-                    {r.cuisine || 'North Indian, Fast Food'}
-                  </p>
+                  <p style={styles.cardCuisine}>{r.cuisine || 'Gourmet Food · Fast Delivery'}</p>
 
-                  <div style={styles.cardMetaRow}>
-                    <span style={styles.cardMeta}>{r.price_range ? `${r.price_range} for two` : '₹₹ for two'}</span>
-                    <span style={styles.metaDot}>·</span>
-                    <span style={styles.cardMeta}>{r.delivery_time || '30 min'}</span>
-                  </div>
+                  <div style={styles.cardFooterMeta}>
+                    <div style={styles.metaTime}>
+                      <Clock size={13} color="#FF6B35" />
+                      <span>{r.delivery_time || '20 min'}</span>
+                    </div>
 
-                  <div style={styles.cardFooterDivider} />
-                  
-                  <div style={styles.cardFooterText}>
-                    <span style={styles.safeIcon}>
-                      <ShieldCheck size={14} color="#1ba672" />
-                    </span>
-                    <span>Follows all Max Safety guidelines</span>
+                    <div style={styles.metaPrice}>{r.price_range || '$$'} for two</div>
+
+                    <button style={styles.orderCardBtn}>
+                      Order <ChevronRight size={14} />
+                    </button>
                   </div>
                 </div>
               </TiltCard>
             ))}
-
-            {filtered.length === 0 && !loadingRestaurants && (
-              <div style={styles.emptyState}>
-                <span style={{ fontSize: '4.5rem', marginBottom: '1rem', display: 'block' }}>🔍</span>
-                <h3 style={{ margin: '0 0 0.5rem', color: 'var(--text-main)', fontSize: '1.4rem' }}>No matching kitchens found</h3>
-                <p style={{ color: 'var(--text-muted)', margin: '0 0 1.5rem', maxWidth: '360px', marginInline: 'auto' }}>
-                  We couldn't find any listings matching your active filters. Try resetting!
-                </p>
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('All');
-                    setFilterRating4(false);
-                    setFilterFastDelivery(false);
-                    setSortBy('default');
-                  }}
-                  style={styles.resetBtn}
-                >
-                  Reset All Filters
-                </button>
-              </div>
-            )}
           </div>
         )}
-      </main>
+      </section>
 
-      {/* ─── Footer ─── */}
-      <footer style={styles.footer}>
-        <div style={styles.footerInner}>
-          <div className="footer-grid">
-            {/* Brand Column */}
+      {/* ── 7. HOW IT WORKS TIMELINE ── */}
+      <section id="how-it-works" style={styles.sectionWrap}>
+        <div style={styles.sectionHeaderCenter}>
+          <div style={styles.sectionBadge}>
+            <TrendingUp size={14} color="#FF6B35" />
+            <span>SIMPLE 4-STEP PROCESS</span>
+          </div>
+          <h2 style={styles.sectionTitle}>How FoodDash Works</h2>
+          <p style={styles.sectionSubtitle}>From craving to doorstep in 4 seamless, automated steps</p>
+        </div>
+
+        <div style={styles.stepsGrid}>
+          {STEPS.map((s, idx) => {
+            const StepIcon = s.icon;
+            return (
+              <div key={idx} style={styles.stepCard} className="hover-lift">
+                <div style={styles.stepNumBadge}>{s.num}</div>
+                <div style={styles.stepIconBox}>
+                  <StepIcon size={26} color="#FF6B35" />
+                </div>
+                <h3 style={styles.stepTitle}>{s.title}</h3>
+                <p style={styles.stepDesc}>{s.desc}</p>
+                {idx < STEPS.length - 1 && <div style={styles.stepArrow} className="hide-mobile">→</div>}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── 8. LIVE ORDER TRACKER INTERACTIVE PREVIEW ── */}
+      <section style={styles.sectionWrap}>
+        <div style={styles.trackerGlassContainer}>
+          <div style={styles.trackerGrid}>
+            <div>
+              <div style={{ ...styles.sectionBadge, background: 'rgba(46,196,182,0.15)', border: '1px solid rgba(46,196,182,0.3)' }}>
+                <Navigation size={14} color="#2EC4B6" />
+                <span style={{ color: '#2EC4B6' }}>LIVE RADAR MOCKUP</span>
+              </div>
+              <h2 style={{ ...styles.sectionTitle, color: '#fff', fontSize: '2.2rem' }}>
+                Track Your Meal in <br />
+                <span style={{ color: '#FFB703' }}>Sub-Meter Real Time</span>
+              </h2>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+                Watch your delivery rider navigate straight to your address with zero lag, 
+                temperature sensor readouts, and automated push notifications.
+              </p>
+
+              <div style={styles.trackerStepList}>
+                {[
+                  { title: 'Order Confirmed', status: 'Completed', icon: CheckCircle2, time: '12:40 PM' },
+                  { title: 'Kitchen Preparing', status: 'Completed', icon: Flame, time: '12:44 PM' },
+                  { title: 'Rider Picked Up', status: 'In Progress', icon: Truck, time: '12:50 PM' },
+                  { title: 'Arriving at Doorstep', status: 'Pending', icon: MapPin, time: 'ETA 1:02 PM' },
+                ].map((item, i) => {
+                  const Icon = item.icon;
+                  const isDone = item.status === 'Completed';
+                  const isInProgress = item.status === 'In Progress';
+                  return (
+                    <div key={i} style={styles.trackerStepRow}>
+                      <div style={{ ...styles.trackerIconCircle, background: isDone ? '#2EC4B6' : isInProgress ? '#FFB703' : 'rgba(255,255,255,0.1)', color: isDone || isInProgress ? '#000' : '#fff' }}>
+                        <Icon size={16} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#fff' }}>{item.title}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>{item.time}</div>
+                      </div>
+                      {isInProgress && <span style={styles.livePulsePill}>LIVE</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Interactive Map Visual */}
+            <div style={styles.mapVisualCard}>
+              <div style={styles.mapVisualHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <img src="/images/logo.png" alt="Rider" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+                  <div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff' }}>Order #FD-9842</div>
+                    <div style={{ fontSize: '0.72rem', color: '#2EC4B6' }}>On time · 12 min arrival</div>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#FFB703' }}>72°F</div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.6)' }}>Thermal Box Temp</div>
+                </div>
+              </div>
+
+              {/* Map Route Graphic */}
+              <div style={styles.mapCanvasBox}>
+                <div style={styles.mapGridPattern} />
+                {/* Rider Pin */}
+                <div style={styles.mapRiderPin} className="animate-pulse-glow">
+                  🛵
+                </div>
+                {/* Destination Pin */}
+                <div style={styles.mapDestPin}>
+                  📍
+                </div>
+                {/* Dotted Route Line */}
+                <svg style={styles.mapRouteSvg}>
+                  <path d="M 50 140 Q 150 50 250 120" stroke="#FF6B35" strokeWidth="4" strokeDasharray="6,6" fill="none" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 9. CUSTOMER REVIEWS CAROUSEL ── */}
+      <section id="reviews" style={styles.sectionWrap}>
+        <div style={styles.sectionHeaderCenter}>
+          <div style={styles.sectionBadge}>
+            <Heart size={14} color="#FF6B35" fill="#FF6B35" />
+            <span>LOVED BY THOUSANDS</span>
+          </div>
+          <h2 style={styles.sectionTitle}>What Foodies Say About Us</h2>
+          <p style={styles.sectionSubtitle}>Verified reviews from food lovers and tech leaders</p>
+        </div>
+
+        <div style={styles.reviewsGrid}>
+          {REVIEWS.map((rev, idx) => (
+            <div key={idx} style={styles.reviewGlassCard} className="hover-lift">
+              <div style={styles.reviewStarsRow}>
+                {[...Array(rev.rating)].map((_, i) => (
+                  <Star key={i} size={16} color="#FFB703" fill="#FFB703" />
+                ))}
+              </div>
+              <p style={styles.reviewText}>"{rev.text}"</p>
+              <div style={styles.reviewUserRow}>
+                <img src={rev.avatar} alt={rev.name} style={styles.reviewAvatar} />
+                <div>
+                  <div style={styles.reviewName}>{rev.name}</div>
+                  <div style={styles.reviewRole}>{rev.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 10. DOWNLOAD MOBILE APP SHOWCASE ── */}
+      <section style={styles.sectionWrap}>
+        <div style={styles.appDownloadCard}>
+          <div style={styles.appDownloadGrid}>
+            <div>
+              <div style={styles.sectionBadge}>
+                <Smartphone size={14} color="#FF6B35" />
+                <span>MOBILE APP EXPERIENCE</span>
+              </div>
+              <h2 style={{ ...styles.sectionTitle, fontSize: '2.4rem' }}>
+                Get The Full Experience <br />
+                On iOS & Android
+              </h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+                Order with 1-tap Apple Pay, track live riders on Lock Screen Live Activities, 
+                and receive exclusive daily 30% discount coupons.
+              </p>
+
+              <div style={styles.storeButtonsRow}>
+                <div style={styles.storeBtn}>
+                  <span style={{ fontSize: '1.5rem' }}>🍏</span>
+                  <div>
+                    <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>Download on</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#fff' }}>App Store</div>
+                  </div>
+                </div>
+
+                <div style={styles.storeBtn}>
+                  <span style={{ fontSize: '1.5rem' }}>🤖</span>
+                  <div>
+                    <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>Get it on</div>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#fff' }}>Google Play</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* QR Code Card */}
+            <div style={styles.qrCodeCard}>
+              <div style={styles.qrCodeBox}>
+                <QrCode size={110} color="#0B0F19" />
+              </div>
+              <p style={{ margin: '0.8rem 0 0', fontWeight: 800, color: 'var(--text-main)', fontSize: '0.9rem' }}>
+                Scan to Install App
+              </p>
+              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                Camera scan auto-opens store
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 11. LIVE ANIMATED STATISTICS COUNTERS ── */}
+      <section style={styles.sectionWrap}>
+        <div style={styles.statsStrip}>
+          {STATS.map((st, i) => {
+            const StatIcon = st.icon;
+            return (
+              <div key={i} style={styles.statBox}>
+                <div style={styles.statIconWrap}>
+                  <StatIcon size={24} color="#FF6B35" />
+                </div>
+                <div style={styles.statValNum}>{st.value}</div>
+                <div style={styles.statValLabel}>{st.label}</div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── 12. ENTERPRISE FOOTER ── */}
+      <footer style={styles.footerWrap}>
+        <div style={styles.footerContainer}>
+          <div style={styles.footerMainGrid}>
+            {/* Column 1: Brand */}
             <div>
               <div style={styles.footerBrandRow}>
-                <img src="/images/logo.png" alt="FoodDash Logo" style={{ width: '42px', height: '42px', borderRadius: '12px', objectFit: 'cover', boxShadow: '0 6px 16px rgba(226,55,68,0.4)', flexShrink: 0 }} />
+                <img src="/images/logo.png" alt="FoodDash" style={styles.footerLogoImg} />
                 <span style={styles.footerBrandName}>FoodDash</span>
-                <span style={{ fontSize: '0.58rem', fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#a855f7)', color: '#fff', padding: '2px 7px', borderRadius: '4px', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Enterprise</span>
+                <span style={styles.footerBrandBadge}>ENTERPRISE</span>
               </div>
-              <p style={styles.footerDesc}>
-                Discover the best food & drinks in your city. Fast delivery with live GPS tracking from your favourite restaurants.
+              <p style={styles.footerDescText}>
+                The world's most advanced 3D food delivery and logistics application. 
+                Delivering culinary bliss to 50K+ customers daily.
               </p>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-                {['App Store', 'Google Play'].map(s => (
-                  <div key={s} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '6px 14px', fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', cursor: 'pointer' }}>{s}</div>
+              <div style={styles.socialIconsRow}>
+                {['🌐', '🐦', '📸', '💼', '▶️'].map((soc, idx) => (
+                  <div key={idx} style={styles.socialCircle}>{soc}</div>
                 ))}
               </div>
             </div>
 
-            {/* Quick Links */}
+            {/* Column 2: Quick Links */}
             <div>
-              <h4 style={styles.footerHeading}>Quick Links</h4>
-              {['Dashboard', 'My Orders', 'Track Order', 'Search Restaurants'].map(l => (
-                <p key={l} style={styles.footerLink}>→ {l}</p>
+              <h4 style={styles.footerHead}>Explore</h4>
+              {['Home', 'Categories', 'Top Restaurants', 'Offers & Discounts', 'Live Order Radar', 'Mobile App'].map(l => (
+                <p key={l} style={styles.footerLinkItem}>→ {l}</p>
               ))}
             </div>
 
-            {/* Support */}
+            {/* Column 3: Company */}
             <div>
-              <h4 style={styles.footerHeading}>Support</h4>
-              {['Help Center', 'Contact Us', 'FAQs', 'Report Issue'].map(l => (
-                <p key={l} style={styles.footerLink}>→ {l}</p>
+              <h4 style={styles.footerHead}>Company</h4>
+              {['About Us', 'Careers', 'Partner Kitchens', 'Rider Network', 'Press Kit', 'Contact Support'].map(l => (
+                <p key={l} style={styles.footerLinkItem}>→ {l}</p>
               ))}
             </div>
 
-            {/* Legal */}
+            {/* Column 4: Newsletter */}
             <div>
-              <h4 style={styles.footerHeading}>Legal</h4>
-              {['Terms of Service', 'Privacy Policy', 'Cookie Policy', 'Refund Policy'].map(l => (
-                <p key={l} style={styles.footerLink}>→ {l}</p>
-              ))}
+              <h4 style={styles.footerHead}>Newsletter</h4>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem', marginBottom: '1rem' }}>
+                Subscribe for exclusive 30% discount drops and culinary updates.
+              </p>
+              {newsletterSubscribed ? (
+                <div style={styles.newsletterSuccessBadge}>
+                  <Check size={16} color="#2EC4B6" />
+                  <span>Subscribed! Check your inbox for $10 off.</span>
+                </div>
+              ) : (
+                <form onSubmit={handleNewsletterSubmit} style={styles.newsletterForm}>
+                  <input
+                    type="email"
+                    placeholder="Enter your email..."
+                    value={newsletterEmail}
+                    onChange={e => setNewsletterEmail(e.target.value)}
+                    style={styles.newsletterInput}
+                  />
+                  <button type="submit" style={styles.newsletterBtn}>
+                    <Send size={15} />
+                  </button>
+                </form>
+              )}
             </div>
           </div>
 
-          {/* Newsletter strip */}
-          <div style={{ margin: '2.5rem 0 2rem', padding: '1.5rem 2rem', background: 'rgba(226,55,68,0.08)', borderRadius: '16px', border: '1px solid rgba(226,55,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-            <div>
-              <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.05rem', marginBottom: '4px', fontFamily: 'var(--font-heading)' }}>🔔 Get exclusive offers in your inbox</div>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.82rem' }}>Join 50,000+ food lovers and never miss a deal.</div>
+          <div style={styles.footerBottomRow}>
+            <div style={styles.footerCopyrightText}>
+              © 2026 FoodDash Enterprise Inc. All rights reserved. Designed by Muhammad Ayan.
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-              <input placeholder="your@email.com" style={{ padding: '0.65rem 1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: '0.88rem', outline: 'none', fontFamily: 'var(--font-body)', minWidth: '200px' }} />
-              <button style={{ padding: '0.65rem 1.2rem', background: 'linear-gradient(135deg,#e23744,#CB202D)', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', boxShadow: '0 4px 14px rgba(226,55,68,0.4)', whiteSpace: 'nowrap' }}>Subscribe</button>
+            <div style={styles.footerLegalRow}>
+              <span>Privacy Policy</span> · <span>Terms of Service</span> · <span>Cookie Policy</span> · <span>Security Audit</span>
             </div>
-          </div>
-
-          <div style={{ ...styles.footerBottom, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <p style={styles.footerCopyright}>
-              © 2026 FoodDash Enterprise. All rights reserved.
-            </p>
-            <p style={{ ...styles.footerCopyright, margin: 0 }}>Built with ❤️ · Powered by Supabase & Stripe</p>
           </div>
         </div>
       </footer>
@@ -621,609 +1144,251 @@ export default function Dashboard() {
   );
 }
 
-/* ─── Style System ─── */
+/* ─── MILLION DOLLAR STARTUP STYLES ─── */
 const styles = {
-  /* ── Nav ──────────────────────────────── */
-  nav: {
-    position: 'fixed',
-    top: 0, left: 0, right: 0,
-    zIndex: 200,
-    padding: '0',
-    transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-    background: 'transparent',
+  pageWrap: {
+    minHeight: '100vh',
+    background: '#FFFFFF',
+    color: '#0B0F19',
+    fontFamily: 'var(--font-body)',
+    position: 'relative',
+    overflowX: 'hidden',
   },
-  navScrolled: {
-    background: 'rgba(255, 255, 255, 0.97)',
+
+  scrollProgressBar: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    height: '4px',
+    background: 'linear-gradient(90deg, #FF6B35, #FFB703, #2EC4B6)',
+    zIndex: 999999,
+    transition: 'width 0.1s ease-out',
+  },
+
+  /* Background Ambient Blobs */
+  ambientBlob1: {
+    position: 'absolute', top: '-100px', right: '-100px', width: '500px', height: '500px',
+    borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,107,53,0.12) 0%, transparent 70%)',
+    pointerEvents: 'none', zIndex: 0, filter: 'blur(60px)',
+  },
+  ambientBlob2: {
+    position: 'absolute', top: '800px', left: '-150px', width: '600px', height: '600px',
+    borderRadius: '50%', background: 'radial-gradient(circle, rgba(46,196,182,0.1) 0%, transparent 70%)',
+    pointerEvents: 'none', zIndex: 0, filter: 'blur(70px)',
+  },
+  ambientBlob3: {
+    position: 'absolute', top: '2200px', right: '-100px', width: '550px', height: '550px',
+    borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,183,3,0.12) 0%, transparent 70%)',
+    pointerEvents: 'none', zIndex: 0, filter: 'blur(65px)',
+  },
+
+  /* 1. Navbar */
+  navbar: {
+    position: 'fixed', top: 0, left: 0, right: 0,
+    zIndex: 9999,
+    padding: '0.8rem 0',
+    background: 'rgba(255, 255, 255, 0.75)',
     backdropFilter: 'blur(20px) saturate(180%)',
     WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    boxShadow: '0 2px 16px rgba(0, 0, 0, 0.08)',
-    borderBottom: '1px solid rgba(232, 232, 238, 0.8)',
+    borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+    transition: 'all 0.3s ease',
+  },
+  navbarScrolled: {
+    background: 'rgba(255, 255, 255, 0.95)',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
   },
   navInner: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0.9rem 2rem',
+    maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem',
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   },
-  navLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    cursor: 'pointer',
-  },
-  brandIcon: { fontSize: '1.8rem' },
-  brandName: {
-    margin: 0,
-    fontSize: '1.6rem',
-    fontWeight: 900,
-    fontFamily: 'var(--font-heading)',
-    letterSpacing: '-0.03em',
-    transition: 'color 0.3s',
-  },
-  navRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.8rem',
-  },
-  navBtn: {
-    background: 'none',
-    border: 'none',
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    padding: '0.45rem 0.8rem',
-    borderRadius: 'var(--radius-full)',
-    transition: 'all 0.2s',
-  },
-  cartBtnNav: {
-    position: 'relative',
-    background: '#E23744',
-    color: '#ffffff',
-    border: 'none',
-    width: '42px',
-    height: '42px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1.1rem',
-    boxShadow: '0 4px 14px rgba(226, 55, 68, 0.4)',
-  },
-  cartBadge: {
-    position: 'absolute',
-    top: '-3px',
-    right: '-3px',
-    background: '#1C1C2E',
-    color: '#ffffff',
-    width: '20px',
-    height: '20px',
-    borderRadius: '50%',
-    fontSize: '0.65rem',
-    fontWeight: 800,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: '2px solid white',
-  },
-  userPill: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-  },
-  avatar: {
-    width: '36px',
-    height: '36px',
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, #E23744, #FF6B35)',
-    color: '#ffffff',
-    fontWeight: 800,
-    fontSize: '0.9rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-  },
-  logoutBtn: {
-    background: 'none',
-    border: 'none',
-    padding: '0.35rem 0.6rem',
-    borderRadius: 'var(--radius-sm)',
-    fontSize: '0.78rem',
-    fontWeight: 600,
-    transition: 'color 0.3s',
-  },
+  brandGroup: { display: 'flex', alignItems: 'center', gap: '0.65rem', cursor: 'pointer' },
+  brandLogoImg: { width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover', boxShadow: '0 4px 14px rgba(255,107,53,0.4)' },
+  brandTitleRow: { display: 'flex', alignItems: 'center', gap: '0.4rem' },
+  brandTitle: { fontSize: '1.4rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: '#0B0F19', letterSpacing: '-0.03em' },
+  brandBadge: { fontSize: '0.58rem', fontWeight: 800, background: 'linear-gradient(135deg, #FF6B35, #FF8C42)', color: '#fff', padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.06em' },
+  brandSub: { fontSize: '0.68rem', color: '#8F9BB3', fontWeight: 600, display: 'block' },
+  navLinksCenter: { display: 'flex', alignItems: 'center', gap: '1.8rem' },
+  navLink: { color: '#475569', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none', transition: 'color 0.2s' },
+  navLinkActive: { color: '#FF6B35', fontWeight: 800, fontSize: '0.9rem', textDecoration: 'none' },
+  navRightGroup: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
+  liveRadarBadge: { display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '20px' },
+  liveRadarTxt: { fontSize: '0.68rem', fontWeight: 800, color: '#15803D' },
+  navGhostBtn: { padding: '0.55rem 0.9rem', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', color: '#0B0F19' },
+  navCartBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '0.55rem 1rem', background: '#0B0F19', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' },
+  cartBadgeNum: { background: '#FF6B35', color: '#fff', borderRadius: '50%', padding: '2px 7px', fontSize: '0.72rem', fontWeight: 800 },
+  userMenuPill: { display: 'flex', alignItems: 'center', gap: '6px', background: '#0B0F19', padding: '4px 8px 4px 4px', borderRadius: '20px' },
+  userAvatarCircle: { width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #FF6B35, #FFB703)', color: '#fff', fontWeight: 800, fontSize: '0.82rem', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  logoutIconButton: { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' },
+  navLoginBtn: { padding: '0.55rem 1rem', background: '#F1F5F9', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', color: '#0B0F19' },
+  navCtaBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '0.6rem 1.2rem', background: BRAND.primaryGrad, color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '0.88rem', cursor: 'pointer', boxShadow: BRAND.primaryGlow },
 
-  /* ── Hero ─────────────────────────────── */
-  heroBanner: {
-    height: '420px',
-    backgroundImage: `url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  heroOverlay: {
-    position: 'absolute',
-    inset: 0,
-    background: 'linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.5) 100%)',
-  },
-  heroContent: {
-    position: 'relative',
-    zIndex: 10,
-    textAlign: 'center',
-    width: '100%',
-    maxWidth: '680px',
-    padding: '0 1.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  heroTitle: {
-    fontSize: '4rem',
-    fontWeight: 900,
-    color: '#ffffff',
-    margin: 0,
-    fontFamily: 'var(--font-heading)',
-    letterSpacing: '-0.05em',
-  },
-  heroSubtitle: {
-    fontSize: '1.35rem',
-    color: 'rgba(255,255,255,0.92)',
-    margin: '0.6rem 0 2rem',
-    fontWeight: 400,
-    letterSpacing: '-0.01em',
-  },
+  /* 2. Hero */
+  heroSection: { position: 'relative', minHeight: '88vh', paddingTop: '100px', display: 'flex', alignItems: 'center', overflow: 'hidden' },
+  heroContainer: { maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '3rem', width: '100%', alignItems: 'center', position: 'relative', zIndex: 10 },
+  heroLeft: { display: 'flex', flexDirection: 'column', gap: '1.25rem' },
+  heroTagBadge: { display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(255,107,53,0.08)', border: '1px solid rgba(255,107,53,0.2)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, color: '#FF6B35', width: 'fit-content' },
+  heroHeading: { fontSize: '3.6rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: '#0B0F19', lineHeight: 1.08, letterSpacing: '-0.04em', margin: 0 },
+  heroHeadingGradient: { background: 'linear-gradient(135deg, #FF6B35 0%, #FFB703 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  heroSubheading: { fontSize: '1.1rem', color: '#64748B', lineHeight: 1.6, margin: 0, maxWidth: '520px' },
+  heroCtaRow: { display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginTop: '0.5rem' },
+  heroPrimaryBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '1rem 2.2rem', background: BRAND.primaryGrad, color: '#fff', border: 'none', borderRadius: '16px', fontWeight: 800, fontSize: '1.05rem', cursor: 'pointer', boxShadow: '0 12px 32px rgba(255,107,53,0.4)' },
+  heroSecondaryBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '1rem 1.8rem', background: '#FFFFFF', color: '#0B0F19', border: '2px solid #F1F5F9', borderRadius: '16px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' },
+  heroTrustGrid: { display: 'flex', alignItems: 'center', gap: '1.5rem', marginTop: '1.5rem', flexWrap: 'wrap' },
+  trustItem: { display: 'flex', alignItems: 'center', gap: '0.75rem' },
+  avatarStack: { display: 'flex', alignItems: 'center' },
+  stackAvatar: { width: '36px', height: '36px', borderRadius: '50%', border: '2px solid #fff', marginLeft: '-10px', objectFit: 'cover' },
+  trustTitle: { fontSize: '0.9rem', fontWeight: 800, color: '#0B0F19' },
+  trustSub: { fontSize: '0.75rem', color: '#94A3B8' },
+  trustDivider: { width: '1px', height: '30px', background: '#E2E8F0' },
+  trustIconCircle: { width: '38px', height: '38px', borderRadius: '50%', background: '#FFFBEB', display: 'flex', alignItems: 'center', justifyContent: 'center' },
 
-  /* ── Search ──────────────────────────── */
-  searchContainer: {
-    background: '#ffffff',
-    borderRadius: 'var(--radius-xl)',
-    width: '100%',
-    padding: '0.6rem',
-    display: 'flex',
-    alignItems: 'center',
-    boxShadow: '0 16px 48px rgba(0,0,0,0.2)',
-    transition: 'all 0.3s',
-  },
-  searchContainerMobile: {
-    background: '#ffffff',
-    borderRadius: 'var(--radius-md)',
-    width: '100%',
-    padding: '0.5rem',
-    display: 'flex',
-    alignItems: 'center',
-    flexDirection: 'column',
-    boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
-  },
-  searchLocSection: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.3rem',
-    padding: '0.5rem 0.8rem',
-    borderRadius: 'var(--radius-md)',
-    cursor: 'pointer',
-    flexShrink: 0,
-    transition: 'background 0.2s',
-  },
-  searchLocIcon: { color: '#E23744', fontSize: '1.1rem' },
-  locText: {
-    color: 'var(--text-main)',
-    fontSize: '0.9rem',
-    fontWeight: 600,
-    whiteSpace: 'nowrap',
-  },
-  locChevron: {
-    color: 'var(--text-muted)',
-    fontSize: '0.8rem',
-    marginLeft: '0.1rem',
-  },
-  searchDivider: {
-    width: '1px',
-    height: '28px',
-    background: 'var(--border)',
-    margin: '0 0.3rem',
-    flexShrink: 0,
-  },
-  searchInputSection: {
-    display: 'flex',
-    alignItems: 'center',
-    flex: 1,
-    padding: '0.3rem 0.6rem',
-  },
-  searchIcon: { color: 'var(--text-muted)', fontSize: '1rem', marginRight: '0.5rem', flexShrink: 0 },
-  searchInput: {
-    flex: 1,
-    border: 'none',
-    fontSize: '0.92rem',
-    color: 'var(--text-main)',
-    width: '100%',
-    background: 'transparent',
-    outline: 'none',
-  },
+  /* Phone Mockup */
+  heroRight: { display: 'flex', justifyContent: 'center', position: 'relative' },
+  phoneStage: { position: 'relative', width: '320px', height: '580px' },
+  phoneMockup: { width: '320px', height: '580px', background: '#0F172A', borderRadius: '44px', border: '10px solid #1E293B', boxShadow: '0 32px 64px rgba(0,0,0,0.3)', padding: '12px', position: 'relative', overflow: 'hidden' },
+  phoneNotch: { width: '120px', height: '22px', background: '#1E293B', borderRadius: '0 0 16px 16px', margin: '0 auto 12px', zIndex: 10, position: 'relative' },
+  phoneScreen: { display: 'flex', flexDirection: 'column', gap: '0.8rem', height: '100%' },
+  phoneHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem', background: 'rgba(255,255,255,0.06)', borderRadius: '12px' },
+  phoneMapCard: { background: 'rgba(255,255,255,0.08)', borderRadius: '16px', padding: '0.8rem', backdropFilter: 'blur(10px)' },
+  phoneMapHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  phoneProgressTrack: { width: '100%', height: '4px', background: 'rgba(255,255,255,0.15)', borderRadius: '2px', marginTop: '0.5rem' },
+  phoneProgressBar: { height: '100%', background: 'linear-gradient(90deg, #FF6B35, #FFB703)', borderRadius: '2px' },
+  phoneRiderAvatar: { width: '32px', height: '32px', borderRadius: '50%', background: '#FF6B35', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' },
+  phoneFoodCard: { display: 'flex', alignItems: 'center', gap: '0.65rem', background: 'rgba(255,255,255,0.06)', padding: '0.6rem', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)' },
+  phoneFoodImg: { width: '44px', height: '44px', borderRadius: '10px', objectFit: 'cover' },
+  phoneAddBtn: { width: '28px', height: '28px', borderRadius: '8px', background: '#FF6B35', border: 'none', color: '#fff', fontWeight: 900, cursor: 'pointer' },
 
-  /* ── Main ─────────────────────────────── */
-  main: { maxWidth: '1200px', margin: '0 auto', padding: '0 2rem 3rem' },
-  mainMobile: { maxWidth: '1200px', margin: '0 auto', padding: '0 1rem 2rem' },
+  /* Floating 3D Badges */
+  floating3dBadge: { position: 'absolute', display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.65rem 1rem', background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(16px)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 20px 40px rgba(0,0,0,0.3)', zIndex: 20 },
+  floatBadgeImg: { width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover' },
+  floating3dPill: { position: 'absolute', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1rem', background: '#0F172A', borderRadius: '30px', border: '1px solid #FF6B35', boxShadow: '0 12px 30px rgba(255,107,53,0.3)', zIndex: 20 },
 
-  /* ── Promos ──────────────────────────── */
-  promoRow: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '1.2rem',
-    margin: '-3rem auto 2.5rem',
-    position: 'relative',
-    zIndex: 30,
-  },
-  promoRowMobile: {
-    display: 'flex',
-    gap: '1rem',
-    overflowX: 'auto',
-    margin: '-2rem auto 2rem',
-    position: 'relative',
-    zIndex: 30,
-    paddingBottom: '0.5rem',
-  },
-  promoCard: {
-    borderRadius: 'var(--radius-xl)',
-    padding: '1.6rem 1.8rem',
-    color: '#ffffff',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-    cursor: 'pointer',
-    transition: 'transform 0.3s, box-shadow 0.3s',
-    minWidth: '260px',
-  },
-  promoTitle: { margin: '0 0 0.15rem', fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.02em' },
-  promoSub: { margin: 0, fontSize: '0.85rem', opacity: 0.9 },
-  promoIcon: { fontSize: '2.4rem' },
+  /* 3. Search */
+  searchSection: { maxWidth: '1280px', margin: '-40px auto 2rem', padding: '0 1.5rem', position: 'relative', zIndex: 30 },
+  searchGlassCard: { background: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(20px)', borderRadius: '24px', padding: '1.25rem 1.5rem', border: '1px solid rgba(226, 232, 240, 0.8)', boxShadow: '0 20px 48px rgba(0,0,0,0.08)' },
+  searchInputRow: { display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.5rem 0.8rem', background: '#F8FAFC', borderRadius: '16px', border: '1.5px solid #E2E8F0' },
+  searchInput: { flex: 1, border: 'none', background: 'transparent', outline: 'none', fontSize: '1rem', color: '#0B0F19', fontFamily: 'var(--font-body)', fontWeight: 500 },
+  clearSearchBtn: { background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', fontSize: '0.9rem' },
+  voiceSearchBtn: { border: 'none', borderRadius: '12px', padding: '0.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center' },
+  filterRow: { display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' },
+  filterLabel: { fontSize: '0.8rem', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' },
+  filterChip: { display: 'flex', alignItems: 'center', gap: '6px', padding: '0.45rem 0.9rem', borderRadius: '20px', border: '1.5px solid #E2E8F0', background: '#fff', color: '#475569', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' },
+  filterChipActive: { background: '#FF6B35', color: '#fff', borderColor: '#FF6B35' },
+  sortDropdownWrap: { display: 'flex', alignItems: 'center', gap: '6px', padding: '0.4rem 0.8rem', background: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E8F0', marginLeft: 'auto' },
+  sortSelect: { border: 'none', background: 'transparent', outline: 'none', fontSize: '0.82rem', fontWeight: 700, color: '#475569', cursor: 'pointer' },
 
-  /* ── Section Header ──────────────────── */
-  sectionHeader: {
-    marginBottom: '0.8rem',
-  },
-  sectionLabel: {
-    fontSize: '1.5rem',
-    fontWeight: 700,
-    margin: 0,
-    color: 'var(--text-main)',
-    fontFamily: 'var(--font-heading)',
-    letterSpacing: '-0.02em',
-  },
+  /* General Section Headers */
+  sectionWrap: { maxWidth: '1280px', margin: '4rem auto', padding: '0 1.5rem' },
+  sectionHeader: { marginBottom: '2rem' },
+  sectionHeaderCenter: { textAlign: 'center', marginBottom: '3rem', maxWidth: '640px', marginInline: 'auto' },
+  sectionHeaderBetween: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' },
+  sectionBadge: { display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', background: 'rgba(255,107,53,0.08)', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, color: '#FF6B35', marginBottom: '0.5rem' },
+  sectionTitle: { fontSize: '2.2rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: '#0B0F19', letterSpacing: '-0.03em', margin: 0 },
+  sectionSubtitle: { fontSize: '1rem', color: '#64748B', margin: '0.5rem 0 0 0' },
 
-  /* ── Categories ──────────────────────── */
-  catScroll: {
-    display: 'flex',
-    gap: '1.2rem',
-    overflowX: 'auto',
-    paddingBottom: '1rem',
-    margin: '0 0 1.5rem',
-  },
-  catPill: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '0.6rem',
-    background: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    flexShrink: 0,
-    padding: '0.5rem',
-    transition: 'all 0.2s',
-  },
-  catIconWrap: {
-    width: '80px',
-    height: '80px',
-    borderRadius: '50%',
-    background: '#F8F8FB',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: '2px solid var(--border)',
-    transition: 'all 0.25s',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-  },
-  catIconWrapActive: {
-    borderColor: '#E23744',
-    background: 'rgba(226, 55, 68, 0.06)',
-    boxShadow: '0 4px 16px rgba(226, 55, 68, 0.15)',
-    transform: 'scale(1.05)',
-  },
-  catIcon: { fontSize: '2rem' },
-  catText: {
-    fontSize: '0.78rem',
-    transition: 'all 0.2s',
-  },
+  /* 4. Categories */
+  categoriesTrack: { display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none' },
+  categoryCircleCard: { minWidth: '110px', padding: '1.25rem 0.8rem', background: '#FFFFFF', border: '1.5px solid #F1F5F9', borderRadius: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', transition: 'all 0.25s ease', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' },
+  categoryCircleCardActive: { background: 'linear-gradient(135deg, #FF6B35, #FF8C42)', color: '#fff', borderColor: '#FF6B35', boxShadow: '0 10px 25px rgba(255,107,53,0.35)', transform: 'scale(1.05)' },
+  categoryIconWrap: { fontSize: '2rem', marginBottom: '2px' },
+  categoryName: { fontSize: '0.82rem', fontWeight: 800, textAlign: 'center' },
+  categoryCount: { fontSize: '0.68rem', opacity: 0.75, fontWeight: 700 },
 
-  /* ── Filters ─────────────────────────── */
-  filtersRow: {
-    display: 'flex',
-    gap: '0.6rem',
-    alignItems: 'center',
-    margin: '0 0 2rem',
-    flexWrap: 'wrap',
-  },
-  sortDropdown: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    marginLeft: 'auto',
-    background: '#ffffff',
-    border: '1.5px solid var(--border)',
-    padding: '0.45rem 0.9rem',
-    borderRadius: 'var(--radius-full)',
-  },
-  sortSelect: {
-    border: 'none',
-    background: 'transparent',
-    fontSize: '0.85rem',
-    fontWeight: 600,
-    color: 'var(--text-secondary)',
-    cursor: 'pointer',
-    outline: 'none',
-  },
+  /* 5. Features Grid */
+  featureGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' },
+  featureGlassCard: { background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' },
+  featureIconBox: { width: '52px', height: '52px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  featureBadge: { fontSize: '0.72rem', fontWeight: 800, padding: '3px 10px', borderRadius: '12px', width: 'fit-content' },
+  featureCardTitle: { fontSize: '1.25rem', fontWeight: 800, color: '#FFFFFF', margin: 0 },
+  featureCardDesc: { fontSize: '0.9rem', color: 'rgba(255,255,255,0.65)', lineHeight: 1.6, margin: 0 },
 
-  /* ── Grid Header ─────────────────────── */
-  gridHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginBottom: '1.2rem',
-    borderBottom: '1px solid var(--border)',
-    paddingBottom: '0.8rem',
-  },
-  resultCount: {
-    color: 'var(--text-muted)',
-    fontSize: '0.88rem',
-    fontWeight: 500,
-  },
+  /* 6. Restaurants Grid */
+  viewAllBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '0.6rem 1.2rem', background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: '12px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' },
+  restaurantGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.75rem' },
+  restaurantCard: { background: '#FFFFFF', borderRadius: '24px', border: '1.5px solid #F1F5F9', overflow: 'hidden', boxShadow: '0 8px 30px rgba(0,0,0,0.05)', cursor: 'pointer', transition: 'all 0.3s ease' },
+  cardImageContainer: { position: 'relative', height: '200px', overflow: 'hidden' },
+  cardImage: { width: '100%', height: '100%', objectFit: 'cover' },
+  cardOverlayGradient: { position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)' },
+  favoriteBtn: { position: 'absolute', top: '12px', right: '12px', width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  promoTag: { position: 'absolute', bottom: '12px', left: '12px', display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: '#FF6B35', color: '#fff', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 800 },
+  distanceChip: { position: 'absolute', top: '12px', left: '12px', display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', color: '#fff', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 700 },
+  cardBodyContent: { padding: '1.25rem' },
+  cardHeaderRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' },
+  cardTitle: { fontSize: '1.15rem', fontWeight: 900, color: '#0B0F19', margin: 0, fontFamily: 'var(--font-heading)' },
+  ratingBadge: { display: 'flex', alignItems: 'center', gap: '4px', background: '#2EC4B6', color: '#fff', padding: '3px 8px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 800 },
+  cardCuisine: { fontSize: '0.85rem', color: '#64748B', margin: '0 0 1rem 0' },
+  cardFooterMeta: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #F1F5F9', paddingTop: '0.9rem' },
+  metaTime: { display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.82rem', fontWeight: 700, color: '#0B0F19' },
+  metaPrice: { fontSize: '0.82rem', color: '#64748B', fontWeight: 600 },
+  orderCardBtn: { display: 'flex', alignItems: 'center', gap: '4px', padding: '0.45rem 0.9rem', background: '#FF6B35', color: '#fff', border: 'none', borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', cursor: 'pointer' },
 
-  /* ── Grid ─────────────────────────────── */
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-    gap: '1.8rem',
-  },
-  gridMobile: {
-    display: 'grid',
-    gridTemplateColumns: '1fr',
-    gap: '1.2rem',
-  },
+  /* 7. Steps */
+  stepsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', position: 'relative' },
+  stepCard: { background: '#F8FAFC', borderRadius: '24px', padding: '2rem 1.5rem', border: '1.5px solid #E2E8F0', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.8rem' },
+  stepNumBadge: { fontSize: '0.75rem', fontWeight: 900, color: '#FF6B35', background: 'rgba(255,107,53,0.1)', padding: '2px 8px', borderRadius: '6px', width: 'fit-content' },
+  stepIconBox: { width: '56px', height: '56px', borderRadius: '16px', background: '#FFFFFF', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  stepTitle: { fontSize: '1.15rem', fontWeight: 800, color: '#0B0F19', margin: 0 },
+  stepDesc: { fontSize: '0.88rem', color: '#64748B', lineHeight: 1.5, margin: 0 },
+  stepArrow: { position: 'absolute', right: '-15px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.5rem', color: '#CBD5E1', fontWeight: 900, zIndex: 10 },
 
-  /* ── Card ─────────────────────────────── */
-  card: {
-    background: '#ffffff',
-    borderRadius: 'var(--radius-lg)',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    border: '1px solid var(--border-light)',
-  },
-  cardImgWrap: {
-    position: 'relative',
-    overflow: 'hidden',
-    height: '210px',
-  },
-  cardImg: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-  },
-  cardImgPlaceholder: {
-    width: '100%',
-    height: '100%',
-    background: 'linear-gradient(135deg, #f0f0f5, #e8e8ef)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardImgGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '50%',
-    background: 'linear-gradient(transparent, rgba(0,0,0,0.55))',
-    pointerEvents: 'none',
-  },
-  promotedBadge: {
-    position: 'absolute',
-    top: '10px',
-    left: '10px',
-    background: 'rgba(0,0,0,0.55)',
-    backdropFilter: 'blur(8px)',
-    color: '#ffffff',
-    padding: '3px 10px',
-    borderRadius: 'var(--radius-sm)',
-    fontSize: '0.68rem',
-    fontWeight: 600,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    zIndex: 5,
-  },
-  cardOfferArea: {
-    position: 'absolute',
-    bottom: '10px',
-    left: '10px',
-    zIndex: 10,
-  },
-  cardTimeArea: {
-    position: 'absolute',
-    bottom: '10px',
-    right: '10px',
-    zIndex: 10,
-  },
-  deliveryBadge: {
-    background: 'rgba(255,255,255,0.95)',
-    backdropFilter: 'blur(8px)',
-    color: 'var(--text-main)',
-    padding: '4px 10px',
-    borderRadius: 'var(--radius-sm)',
-    fontSize: '0.75rem',
-    fontWeight: 700,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-  },
+  /* 8. Live Tracker Container */
+  trackerGlassContainer: { background: '#0B0F19', borderRadius: '32px', padding: '3.5rem 2.5rem', boxShadow: '0 32px 64px rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)' },
+  trackerGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' },
+  trackerStepList: { display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' },
+  trackerStepRow: { display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255,255,255,0.05)', padding: '0.9rem 1.2rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' },
+  trackerIconCircle: { width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  livePulsePill: { fontSize: '0.65rem', fontWeight: 800, background: '#FFB703', color: '#000', padding: '2px 8px', borderRadius: '10px' },
+  mapVisualCard: { background: '#1E293B', borderRadius: '24px', padding: '1.25rem', border: '1px solid rgba(255,255,255,0.1)' },
+  mapVisualHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' },
+  mapCanvasBox: { height: '220px', background: '#0F172A', borderRadius: '16px', position: 'relative', overflow: 'hidden' },
+  mapGridPattern: { position: 'absolute', inset: 0, opacity: 0.15, backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '16px 16px' },
+  mapRiderPin: { position: 'absolute', top: '40%', left: '30%', fontSize: '1.8rem', zIndex: 10 },
+  mapDestPin: { position: 'absolute', top: '65%', left: '75%', fontSize: '1.8rem', zIndex: 10 },
+  mapRouteSvg: { position: 'absolute', inset: 0, width: '100%', height: '100%' },
 
-  /* ── Card Body ───────────────────────── */
-  cardBody: { padding: '1rem 1.3rem 1.2rem' },
-  cardTitleRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '0.15rem',
-    gap: '0.5rem',
-  },
-  cardTitle: {
-    margin: 0,
-    fontSize: '1.1rem',
-    fontWeight: 800,
-    color: 'var(--text-main)',
-    fontFamily: 'var(--font-heading)',
-    letterSpacing: '-0.01em',
-    lineHeight: 1.3,
-  },
-  ratingBadge: {
-    padding: '2px 8px',
-    borderRadius: 'var(--radius-xs)',
-    fontSize: '0.78rem',
-    fontWeight: 800,
-    flexShrink: 0,
-    color: '#ffffff',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '2px',
-  },
-  cardCuisine: {
-    margin: '0 0 0.4rem',
-    color: 'var(--text-muted)',
-    fontSize: '0.82rem',
-    lineHeight: 1.4,
-  },
-  cardMetaRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    fontSize: '0.8rem',
-    color: 'var(--text-secondary)',
-    marginBottom: '0.6rem',
-  },
-  cardMeta: { fontWeight: 500 },
-  metaDot: { color: 'var(--border-strong)' },
-  cardFooterDivider: {
-    height: '1px',
-    background: 'var(--border)',
-    margin: '0.6rem 0',
-  },
-  cardFooterText: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.4rem',
-    fontSize: '0.72rem',
-    color: 'var(--text-muted)',
-    fontWeight: 500,
-  },
-  safeIcon: {
-    display: 'flex',
-    alignItems: 'center',
-  },
+  /* 9. Reviews */
+  reviewsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' },
+  reviewGlassCard: { background: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: '24px', padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' },
+  reviewStarsRow: { display: 'flex', gap: '4px' },
+  reviewText: { fontSize: '0.95rem', color: '#334155', lineHeight: 1.6, fontStyle: 'italic', margin: 0 },
+  reviewUserRow: { display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: 'auto' },
+  reviewAvatar: { width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover' },
+  reviewName: { fontSize: '0.92rem', fontWeight: 800, color: '#0B0F19' },
+  reviewRole: { fontSize: '0.75rem', color: '#64748B' },
 
-  /* ── Empty State ─────────────────────── */
-  emptyState: {
-    gridColumn: '1 / -1',
-    textAlign: 'center',
-    padding: '4rem 2rem',
-    background: '#ffffff',
-    borderRadius: 'var(--radius-lg)',
-    border: '1px dashed var(--border-strong)',
-  },
-  resetBtn: {
-    background: 'linear-gradient(135deg, #E23744, #CB202D)',
-    color: '#ffffff',
-    border: 'none',
-    padding: '0.7rem 1.6rem',
-    borderRadius: 'var(--radius-md)',
-    fontSize: '0.9rem',
-    fontWeight: 700,
-    boxShadow: '0 6px 20px rgba(226, 55, 68, 0.3)',
-    cursor: 'pointer',
-  },
+  /* 10. App Download */
+  appDownloadCard: { background: 'linear-gradient(135deg, #FFFBEB 0%, #EFF6FF 100%)', borderRadius: '32px', padding: '3.5rem 2.5rem', border: '1.5px solid #FEF3C7' },
+  appDownloadGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'center' },
+  storeButtonsRow: { display: 'flex', gap: '1rem', flexWrap: 'wrap' },
+  storeBtn: { display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1.4rem', background: '#0B0F19', color: '#fff', borderRadius: '16px', cursor: 'pointer' },
+  qrCodeCard: { background: '#FFFFFF', borderRadius: '24px', padding: '1.75rem', textAlign: 'center', boxShadow: '0 12px 32px rgba(0,0,0,0.06)', width: 'fit-content', margin: '0 auto' },
+  qrCodeBox: { padding: '1rem', background: '#F8FAFC', borderRadius: '16px', border: '1px dashed #CBD5E1', display: 'inline-block' },
 
-  /* ── Footer ──────────────────────────── */
-  footer: {
-    background: '#1C1C2E',
-    padding: '4rem 2rem 2rem',
-    marginTop: '4rem',
-  },
-  footerInner: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-  },
-  footerBrandRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    marginBottom: '1rem',
-  },
-  footerBrandName: {
-    fontFamily: 'var(--font-heading)',
-    fontSize: '1.6rem',
-    fontWeight: 900,
-    color: '#ffffff',
-  },
-  footerDesc: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: '0.88rem',
-    margin: '0 0 1.5rem',
-    maxWidth: '340px',
-    lineHeight: 1.6,
-  },
-  socialRow: {
-    display: 'flex',
-    gap: '0.6rem',
-  },
-  socialIcon: {
-    width: '36px',
-    height: '36px',
-    borderRadius: '50%',
-    background: 'rgba(255,255,255,0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '0.9rem',
-    cursor: 'pointer',
-    transition: 'background 0.2s',
-  },
-  footerHeading: {
-    color: '#ffffff',
-    fontSize: '0.88rem',
-    fontWeight: 700,
-    marginBottom: '1rem',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-  },
-  footerLink: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: '0.85rem',
-    marginBottom: '0.65rem',
-    cursor: 'pointer',
-    transition: 'color 0.2s',
-  },
-  footerBottom: {
-    borderTop: '1px solid rgba(255,255,255,0.1)',
-    marginTop: '3rem',
-    paddingTop: '1.5rem',
-    textAlign: 'center',
-  },
-  footerCopyright: {
-    margin: 0,
-    color: 'rgba(255,255,255,0.35)',
-    fontSize: '0.78rem',
-  },
+  /* 11. Stats Strip */
+  statsStrip: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', background: '#0B0F19', borderRadius: '28px', padding: '2.5rem 2rem' },
+  statBox: { textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' },
+  statIconWrap: { width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,107,53,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem' },
+  statValNum: { fontSize: '2.4rem', fontWeight: 900, color: '#FFFFFF', fontFamily: 'var(--font-heading)' },
+  statValLabel: { fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', fontWeight: 600 },
+
+  /* 12. Footer */
+  footerWrap: { background: '#0B0F19', color: '#FFFFFF', paddingTop: '4rem', paddingBottom: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' },
+  footerContainer: { maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' },
+  footerMainGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '2.5rem', marginBottom: '3rem' },
+  footerBrandRow: { display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' },
+  footerLogoImg: { width: '40px', height: '40px', borderRadius: '12px', objectFit: 'cover' },
+  footerBrandName: { fontSize: '1.4rem', fontWeight: 900, fontFamily: 'var(--font-heading)', color: '#FFFFFF' },
+  footerBrandBadge: { fontSize: '0.58rem', fontWeight: 800, background: '#FF6B35', color: '#fff', padding: '2px 6px', borderRadius: '4px' },
+  footerDescText: { color: 'rgba(255,255,255,0.6)', fontSize: '0.88rem', lineHeight: 1.6 },
+  socialIconsRow: { display: 'flex', gap: '0.5rem', marginTop: '1.25rem' },
+  socialCircle: { width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', cursor: 'pointer' },
+  footerHead: { fontSize: '1.05rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '1.25rem' },
+  footerLinkItem: { color: 'rgba(255,255,255,0.6)', fontSize: '0.88rem', margin: '0 0 0.6rem 0', cursor: 'pointer', transition: 'color 0.2s' },
+  newsletterForm: { display: 'flex', gap: '0.5rem' },
+  newsletterInput: { flex: 1, padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.08)', color: '#fff', outline: 'none', fontSize: '0.88rem' },
+  newsletterBtn: { padding: '0.75rem 1rem', background: '#FF6B35', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 800 },
+  newsletterSuccessBadge: { display: 'flex', alignItems: 'center', gap: '6px', padding: '0.75rem', background: 'rgba(46,196,182,0.15)', border: '1px solid rgba(46,196,182,0.3)', borderRadius: '12px', color: '#2EC4B6', fontSize: '0.82rem', fontWeight: 700 },
+  footerBottomRow: { borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' },
+  footerCopyrightText: { color: 'rgba(255,255,255,0.45)', fontSize: '0.82rem' },
+  footerLegalRow: { color: 'rgba(255,255,255,0.45)', fontSize: '0.82rem' },
 };
