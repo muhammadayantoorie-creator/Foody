@@ -12,19 +12,19 @@ An enterprise-grade, cross-platform food ordering and restaurant management solu
 
 ---
 
-## 🌟 Key Features
+##  Key Features
 
-### 🎨 3D WebGL Visual Experience
+###  3D WebGL Visual Experience
 - **Interactive 3D Hero Canvases:** Dynamic Three.js particle systems, floating geometries, lighting effects, and cursor tracking across Dashboard, Login, Signup, Forgot Password, and 404 pages.
 - **Hardware-Accelerated Tilt Cards:** Real-time 3D tilt response and specular lighting physics on restaurant listing cards.
 - **Zomato-Inspired Premium UI:** Deep dark-mode aesthetics, custom glassmorphism design tokens (`backdrop-filter`), neon highlights, micro-animations, and smooth page transitions.
 
-### 🖥️ Native Enterprise Desktop Application (Electron)
+###  Native Enterprise Desktop Application (Electron)
 - **Frameless Window Management:** Custom draggable titlebar with minimize, maximize, pin-on-top (`📌`), and close controls.
 - **Hardware POS Printer Bridge:** Direct thermal receipt printer detection via native Electron IPC (`getPrinters()`).
 - **Real-Time System Bar:** Monospace status bar displaying connection health, live network ping (ms), JS heap memory footprint (MB), and keyboard shortcuts (`Ctrl+Shift+O/P/M`).
 
-### 🛍️ Customer Experience & Ordering
+###  Customer Experience & Ordering
 - **Real-Time Search & Category Filters:** Search by cuisine, dish, or restaurant name; filter by Rating 4.0+, Fast Delivery (≤30 min), or Veg Only.
 - **Interactive Cart Sidebar:** Sliding cart panel with quantity controls, coupon promo engine (`FOODDASH10` for 10% off), delivery time estimator, and bill breakdown (subtotal, delivery fee, GST).
 - **Multi-Method Checkout:** Support for Credit/Debit Cards (Stripe), Cash on Delivery, JazzCash, and EasyPaisa.
@@ -37,7 +37,7 @@ An enterprise-grade, cross-platform food ordering and restaurant management solu
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
 FoodDash System
@@ -62,19 +62,19 @@ FoodDash System
 
 ---
 
-## 🛠️ Getting Started
+##  Getting Started
 
-### 📋 Prerequisites
+### Prerequisites
 - **Node.js**: `v18.x` or higher
 - **npm**: `v9.x` or higher
 
-### 📥 1. Clone the Repository
+###  1. Clone the Repository
 ```bash
 git clone https://github.com/muhammadayantoorie-creator/Foody.git
 cd Foody
 ```
 
-### 📦 2. Install Dependencies
+###  2. Install Dependencies
 ```bash
 # Install frontend dependencies
 npm install
@@ -85,7 +85,7 @@ npm install
 cd ..
 ```
 
-### 🔑 3. Environment Setup
+###  3. Environment Setup
 Create a `.env` file in the root directory:
 ```env
 # ─── Supabase Configuration ───────────────────────
@@ -106,7 +106,7 @@ RESEND_FROM_EMAIL=onboarding@resend.dev
 
 ---
 
-## 🗄️ Database Setup (Supabase)
+##  Database Setup (Supabase)
 
 1. Navigate to your [Supabase Dashboard](https://supabase.com) ➔ **SQL Editor**.
 2. Run `COMPLETE_SCHEMA.sql` to create all tables and default structure.
@@ -115,28 +115,28 @@ RESEND_FROM_EMAIL=onboarding@resend.dev
 
 ---
 
-## 🚀 Running the Application
+##  Running the Application
 
-### 🌐 Web Application (Vite Dev Server)
+###  Web Application (Vite Dev Server)
 ```bash
 npm run dev
 # Open http://localhost:5173
 ```
 
-### ⚡ Backend API Server (Node.js Express)
+###  Backend API Server (Node.js Express)
 ```bash
 node backend/server.js
 # Health check at http://localhost:4242/health
 ```
 
-### 🖥️ Native Desktop Application (Electron)
+###  Native Desktop Application (Electron)
 ```bash
 npx electron .
 ```
 
 ---
 
-## 📦 Building for Production
+##  Building for Production
 
 ### Build Web Frontend & PWA
 ```bash
@@ -146,7 +146,7 @@ The optimized production bundle will be generated in the `dist/` directory, incl
 
 ---
 
-## 📄 License
+##  License
 This project is licensed under the MIT License — feel free to customize and expand for your enterprise needs.
 
 ---
