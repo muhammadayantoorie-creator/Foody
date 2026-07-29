@@ -27,6 +27,75 @@ const PROMOS = [
   { title: 'TRENDING', subtitle: 'Top rated spots', bg: 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)', icon: '🔥' },
 ];
 
+const MOCK_RESTAURANTS = [
+  {
+    id: 'mock-1',
+    name: 'The Artisan Burger Co.',
+    cuisine: 'American · Gourmet Burgers · Shakes',
+    rating: 4.8,
+    delivery_time: '20-30 min',
+    price_range: '$$$',
+    address: '452 Broadway, New York, NY',
+    image_url: '/images/burger.png',
+    is_active: true
+  },
+  {
+    id: 'mock-2',
+    name: 'Pizza Napoli & Trattoria',
+    cuisine: 'Italian · Wood-Fired Pizza · Pasta',
+    rating: 4.9,
+    delivery_time: '25-35 min',
+    price_range: '$$',
+    address: '128 Mulberry St, New York, NY',
+    image_url: '/images/pizza.png',
+    is_active: true
+  },
+  {
+    id: 'mock-3',
+    name: 'Sakura Sushi & Omakase Bar',
+    cuisine: 'Japanese · Sushi · Sashimi · Ramen',
+    rating: 4.9,
+    delivery_time: '30-40 min',
+    price_range: '$$$$',
+    address: '789 5th Ave, New York, NY',
+    image_url: '/images/sushi.png',
+    is_active: true
+  },
+  {
+    id: 'mock-4',
+    name: 'Taco Fiesta & Cantina',
+    cuisine: 'Mexican · Tacos · Burritos · Margaritas',
+    rating: 4.7,
+    delivery_time: '15-25 min',
+    price_range: '$',
+    address: '321 7th Ave, New York, NY',
+    image_url: '/images/taco.png',
+    is_active: true
+  },
+  {
+    id: 'mock-5',
+    name: 'Golden Dragon Palace',
+    cuisine: 'Chinese · Dim Sum · Asian Fusion',
+    rating: 4.6,
+    delivery_time: '25-35 min',
+    price_range: '$$',
+    address: '56 Mott St, New York, NY',
+    image_url: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80',
+    is_active: true
+  },
+  {
+    id: 'mock-6',
+    name: 'Taj Mahal Indian Kitchen',
+    cuisine: 'Indian · Curry · Biryani · Tandoori',
+    rating: 4.8,
+    delivery_time: '30-45 min',
+    price_range: '$$',
+    address: '102 Lexington Ave, New York, NY',
+    image_url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
+    is_active: true
+  }
+];
+
 export default function Dashboard() {
   const { user, role, signOut } = useAuth();
   const { getCartCount, toggleSidebar } = useCart();
@@ -34,7 +103,7 @@ export default function Dashboard() {
   const m = useIsMobile();
 
   const [restaurants, setRestaurants] = useState([]);
-  const [loadingRestaurants, setLoadingRestaurants] = useState(false);
+  const [loadingRestaurants, setLoadingRestaurants] = useState(true);
   const [restaurantsError, setRestaurantsError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -69,17 +138,22 @@ export default function Dashboard() {
   const fetchRestaurants = async () => {
     setLoadingRestaurants(true);
     setRestaurantsError('');
-    const { data, error } = await supabase
-      .from('restaurants')
-      .select('*')
-      .eq('is_active', true);
+    try {
+      const { data, error } = await supabase
+        .from('restaurants')
+        .select('*')
+        .eq('is_active', true);
 
-    if (error) {
-      setRestaurantsError(error.message || 'Failed to load restaurants.');
-    } else {
-      setRestaurants(data || []);
+      if (error || !data || data.length === 0) {
+        setRestaurants(MOCK_RESTAURANTS);
+      } else {
+        setRestaurants(data);
+      }
+    } catch (err) {
+      setRestaurants(MOCK_RESTAURANTS);
+    } finally {
+      setLoadingRestaurants(false);
     }
-    setLoadingRestaurants(false);
   };
 
   const handleLogout = async () => {

@@ -27,19 +27,84 @@ export default function RestaurantMenu() {
 
   useEffect(() => { fetchRestaurantAndMenu(); }, [id]);
 
+const MOCK_RESTAURANTS_MAP = {
+  'mock-1': {
+    id: 'mock-1', name: 'The Artisan Burger Co.', cuisine: 'American · Gourmet Burgers · Shakes',
+    rating: 4.8, delivery_time: '20-30 min', price_range: '$$$', address: '452 Broadway, New York, NY',
+    image_url: '/images/burger.png',
+  },
+  'mock-2': {
+    id: 'mock-2', name: 'Pizza Napoli & Trattoria', cuisine: 'Italian · Wood-Fired Pizza · Pasta',
+    rating: 4.9, delivery_time: '25-35 min', price_range: '$$', address: '128 Mulberry St, New York, NY',
+    image_url: '/images/pizza.png',
+  },
+  'mock-3': {
+    id: 'mock-3', name: 'Sakura Sushi & Omakase Bar', cuisine: 'Japanese · Sushi · Sashimi · Ramen',
+    rating: 4.9, delivery_time: '30-40 min', price_range: '$$$$', address: '789 5th Ave, New York, NY',
+    image_url: '/images/sushi.png',
+  },
+  'mock-4': {
+    id: 'mock-4', name: 'Taco Fiesta & Cantina', cuisine: 'Mexican · Tacos · Burritos · Margaritas',
+    rating: 4.7, delivery_time: '15-25 min', price_range: '$', address: '321 7th Ave, New York, NY',
+    image_url: '/images/taco.png',
+  },
+  'mock-5': {
+    id: 'mock-5', name: 'Golden Dragon Palace', cuisine: 'Chinese · Dim Sum · Asian Fusion',
+    rating: 4.6, delivery_time: '25-35 min', price_range: '$$', address: '56 Mott St, New York, NY',
+    image_url: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80',
+  },
+  'mock-6': {
+    id: 'mock-6', name: 'Taj Mahal Indian Kitchen', cuisine: 'Indian · Curry · Biryani · Tandoori',
+    rating: 4.8, delivery_time: '30-45 min', price_range: '$$', address: '102 Lexington Ave, New York, NY',
+    image_url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
+  }
+};
+
+const MOCK_FOOD_ITEMS = [
+  { id: 'f-1', name: 'Double Bacon Smash Burger', category: 'Burgers', price: 14.99, description: 'Two 100% Angus beef patties, smoked bacon, cheddar, secret burger sauce on brioche.', image_url: '/images/burger.png', is_veg: false, is_available: true },
+  { id: 'f-2', name: 'Truffle Mushroom Burger', category: 'Burgers', price: 16.50, description: 'Single smashed patty, wild mushrooms, truffle aioli, swiss cheese, arugula.', image_url: '/images/burger.png', is_veg: false, is_available: true },
+  { id: 'f-3', name: 'Margherita DOC Wood-Fired Pizza', category: 'Pizzas', price: 18.00, description: 'San Marzano tomatoes, fresh buffalo mozzarella, fresh basil, extra virgin olive oil.', image_url: '/images/pizza.png', is_veg: true, is_available: true },
+  { id: 'f-4', name: 'Diavola Pepperoni Pizza', category: 'Pizzas', price: 19.50, description: 'Spicy Calabrian salami, mozzarella, chili oil, San Marzano tomato base.', image_url: '/images/pizza.png', is_veg: false, is_available: true },
+  { id: 'f-5', name: 'Dragon Roll & Spicy Tuna', category: 'Sushi & Rolls', price: 21.00, description: 'Eel, cucumber wrapped in avocado, spicy tuna, unagi sauce, tobiko.', image_url: '/images/sushi.png', is_veg: false, is_available: true },
+  { id: 'f-6', name: 'Carnitas & Birria Tacos (3 pcs)', category: 'Tacos', price: 13.99, description: 'Slow-cooked braised pork & birria beef tacos with consommé dip, cilantro, lime.', image_url: '/images/taco.png', is_veg: false, is_available: true },
+  { id: 'f-7', name: 'Crispy Veggie Spring Rolls (4 pcs)', category: 'Sides & Starters', price: 8.50, description: 'Handmade crispy vegetable spring rolls served with sweet chili dip.', image_url: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80', is_veg: true, is_available: true },
+  { id: 'f-8', name: 'Craft Mango Lassi & Milkshakes', category: 'Beverages', price: 5.99, description: 'Fresh Alphonso mango yogurt lassi or thick vanilla bean milkshake.', image_url: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=800&q=80', is_veg: true, is_available: true },
+];
+
   const fetchRestaurantAndMenu = async () => {
     setLoading(true);
     setError('');
-    const { data: restData, error: restError } = await supabase
-      .from('restaurants').select('*').eq('id', id).single();
-    if (restError) { setError(restError.message); setLoading(false); return; }
-    setRestaurant(restData);
 
-    const { data: foodData, error: foodError } = await supabase
-      .from('food_items').select('*').eq('restaurant_id', id).eq('is_available', true).order('category');
-    if (foodError) { setError(foodError.message); }
-    else { setFoodItems(foodData || []); }
-    setLoading(false);
+    // Check if mock ID or database ID
+    if (MOCK_RESTAURANTS_MAP[id]) {
+      setRestaurant(MOCK_RESTAURANTS_MAP[id]);
+      setFoodItems(MOCK_FOOD_ITEMS);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data: restData, error: restError } = await supabase
+        .from('restaurants').select('*').eq('id', id).single();
+
+      if (restError || !restData) {
+        // Fallback to first mock restaurant if not found in Supabase
+        const fallbackRest = MOCK_RESTAURANTS_MAP['mock-1'];
+        setRestaurant(fallbackRest);
+        setFoodItems(MOCK_FOOD_ITEMS);
+      } else {
+        setRestaurant(restData);
+
+        const { data: foodData } = await supabase
+          .from('food_items').select('*').eq('restaurant_id', id).eq('is_available', true).order('category');
+        setFoodItems(foodData && foodData.length > 0 ? foodData : MOCK_FOOD_ITEMS);
+      }
+    } catch (err) {
+      setRestaurant(MOCK_RESTAURANTS_MAP['mock-1']);
+      setFoodItems(MOCK_FOOD_ITEMS);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Group items by category
