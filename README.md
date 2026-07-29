@@ -151,6 +151,13 @@ This project is licensed under the MIT License — feel free to customize and ex
 
 ---
 
+## 👤 Author & Repository
+
+- **Author:** **Muhammad Ayan**
+- **GitHub Repository:** [https://github.com/muhammadayantoorie-creator/Foody](https://github.com/muhammadayantoorie-creator/Foody)
+
+---
+
 <p align="center">
-  Built with ❤️ using <strong>React</strong>, <strong>Three.js</strong>, <strong>Electron</strong>, <strong>Supabase</strong> & <strong>Stripe</strong>
+  Crafted with ❤️ by <strong>Muhammad Ayan</strong> using <strong>React</strong>, <strong>Three.js</strong>, <strong>Electron</strong>, <strong>Supabase</strong> & <strong>Stripe</strong>
 </p>
