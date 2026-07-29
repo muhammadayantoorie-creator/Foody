@@ -22,9 +22,7 @@ export default function DesktopTitlebar() {
       <div style={styles.dragRegion}>
         {/* Logo */}
         <div style={styles.brand}>
-          <div style={styles.logoCircle}>
-            <span style={{ fontSize: '0.85rem' }}>🍔</span>
-          </div>
+          <img src="/images/logo.png" alt="FoodDash Logo" style={{ width: '22px', height: '22px', borderRadius: '5px', objectFit: 'cover' }} />
           <span style={styles.appName}>FoodDash</span>
           <span style={styles.badge}>ENTERPRISE</span>
         </div>

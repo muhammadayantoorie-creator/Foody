@@ -132,15 +132,15 @@ export default function Dashboard() {
       }}>
         <div style={styles.navInner}>
           <div style={styles.navLeft} onClick={() => navigate('/dashboard')}>
-            <div style={{
-              width: '38px', height: '38px',
-              background: 'linear-gradient(135deg, #e23744, #ff6b35)',
-              borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: scrolled ? '0 4px 12px rgba(226,55,68,0.4)' : '0 4px 16px rgba(226,55,68,0.6)',
-              transition: 'all 0.3s', flexShrink: 0,
-            }}>
-              <span style={{ fontSize: '1.2rem' }}>🍔</span>
-            </div>
+            <img
+              src="/images/logo.png"
+              alt="FoodDash Logo"
+              style={{
+                width: '38px', height: '38px', borderRadius: '10px', objectFit: 'cover',
+                boxShadow: scrolled ? '0 4px 12px rgba(226,55,68,0.4)' : '0 4px 16px rgba(226,55,68,0.6)',
+                transition: 'all 0.3s', flexShrink: 0,
+              }}
+            />
             <h1 style={{ ...styles.brandName, color: scrolled ? 'var(--primary)' : '#ffffff' }}>FoodDash</h1>
             <span style={{
               fontSize: '0.58rem', fontWeight: 800, letterSpacing: '0.07em',
@@ -484,9 +484,7 @@ export default function Dashboard() {
             {/* Brand Column */}
             <div>
               <div style={styles.footerBrandRow}>
-                <div style={{ width: '42px', height: '42px', background: 'linear-gradient(135deg, #e23744, #ff6b35)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 16px rgba(226,55,68,0.4)', flexShrink: 0 }}>
-                  <span style={{ fontSize: '1.3rem' }}>🍔</span>
-                </div>
+                <img src="/images/logo.png" alt="FoodDash Logo" style={{ width: '42px', height: '42px', borderRadius: '12px', objectFit: 'cover', boxShadow: '0 6px 16px rgba(226,55,68,0.4)', flexShrink: 0 }} />
                 <span style={styles.footerBrandName}>FoodDash</span>
                 <span style={{ fontSize: '0.58rem', fontWeight: 800, background: 'linear-gradient(135deg,#6366f1,#a855f7)', color: '#fff', padding: '2px 7px', borderRadius: '4px', letterSpacing: '0.07em', textTransform: 'uppercase' }}>Enterprise</span>
               </div>

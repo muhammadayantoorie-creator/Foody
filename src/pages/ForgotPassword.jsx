@@ -114,7 +114,7 @@ export default function ForgotPassword() {
         <div style={S.leftOverlay} />
         <div style={S.leftContent}>
           <div style={S.logoRow} className="animate-fade-up">
-            <div style={S.logoIconWrap}><span style={{ fontSize: '1.5rem' }}>🍔</span></div>
+            <img src="/images/logo.png" alt="FoodDash Logo" style={{ width: '44px', height: '44px', borderRadius: '12px', objectFit: 'cover', boxShadow: '0 8px 20px rgba(99,102,241,0.4)', flexShrink: 0 }} />
             <h1 style={S.brand}>FoodDash</h1>
             <span style={S.enterpriseBadge}>ENTERPRISE</span>
           </div>
