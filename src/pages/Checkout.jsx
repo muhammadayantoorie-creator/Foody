@@ -54,6 +54,8 @@ function StepIndicator({ current }) {
 
 /* ─── Step 1: Cart Review ─────────────────────────────────── */
 function CartStep({ cartItems, updateQuantity, removeFromCart, subtotal, onNext }) {
+  const { formatPrice } = useLanguageCurrency();
+
   if (cartItems.length === 0) return (
     <div style={ui.emptyBox} className="animate-fade-up">
       <div style={{ fontSize: '4.5rem', marginBottom: '1.2rem', animation: 'float 3s infinite' }}>🛒</div>
@@ -81,7 +83,7 @@ function CartStep({ cartItems, updateQuantity, removeFromCart, subtotal, onNext 
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={ui.itemName}>{item.name}</p>
-              <p style={ui.itemUnit}>${Number(item.price).toFixed(2)} each</p>
+              <p style={ui.itemUnit}>{formatPrice(item.price)} each</p>
             </div>
             
             <div style={ui.qtyBlock}>
@@ -90,7 +92,7 @@ function CartStep({ cartItems, updateQuantity, removeFromCart, subtotal, onNext 
               <button style={ui.qtyBtn} onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
             </div>
             
-            <div style={ui.itemLineTotal}>${(item.price * item.quantity).toFixed(2)}</div>
+            <div style={ui.itemLineTotal}>{formatPrice(item.price * item.quantity)}</div>
             <button style={ui.removeBtn} onClick={() => removeFromCart(item.id)} title="Remove">✕</button>
           </div>
         ))}
@@ -409,7 +411,7 @@ function PaymentStep({ subtotal, address, phone, note, cartItems, user, clearCar
 
       {paymentMethod === 'Cash on Delivery' && (
         <div style={ui.codWarning} className="animate-fade-up">
-          <span>💵</span> You will pay <strong>${grandTotal.toFixed(2)}</strong> when your order is delivered.
+          <span>💵</span> You will pay <strong>{formatPrice(grandTotal)}</strong> when your order is delivered in PKR.
         </div>
       )}
 
@@ -418,7 +420,7 @@ function PaymentStep({ subtotal, address, phone, note, cartItems, user, clearCar
       <div style={ui.btnRow}>
         <button type="button" style={ui.backBtn} onClick={onBack} disabled={loading}>← Back</button>
         <button type="submit" style={{ ...ui.nextBtn, opacity: loading ? 0.7 : 1 }} disabled={loading} className="animate-pulse-glow">
-          {loading ? '⏳ Processing…' : `Pay & Place Order · $${grandTotal.toFixed(2)}`}
+          {loading ? '⏳ Processing…' : `Pay & Place Order · ${formatPrice(grandTotal)}`}
         </button>
       </div>
     </form>

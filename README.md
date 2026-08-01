@@ -2,17 +2,16 @@
   <img src="docs/images/logo.png" alt="FoodDash Enterprise Logo" width="180" style="border-radius: 24px; box-shadow: 0 12px 32px rgba(226, 55, 68, 0.4);" />
 </p>
 
-# 🍔 FoodDash Enterprise — Next-Gen 3D Food Delivery Platform
+# 🇵🇰 FoodDash Pakistan — Top Pakistani Hotels & Brands 3D Delivery Platform
 
 [![React](https://img.shields.io/badge/React-18.x-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Three.js](https://img.shields.io/badge/Three.js-WebGL-black?logo=three.js&logoColor=white)](https://threejs.org/)
 [![Electron](https://img.shields.io/badge/Electron-Desktop-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
-[![Stripe](https://img.shields.io/badge/Stripe-Payments-008CDD?logo=stripe&logoColor=white)](https://stripe.com/)
-[![PWA Ready](https://img.shields.io/badge/PWA-Service_Worker-purple?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
+[![PKR Ready](https://img.shields.io/badge/Pakistan-PKR_JazzCash_EasyPaisa-green?logo=pakistan&logoColor=white)](https://fooddash.pk/)
 
-An enterprise-grade, cross-platform food ordering and restaurant management solution featuring hardware-accelerated **3D WebGL visuals**, interactive card physics, dual **Web + Native Desktop (Electron)** runtime environments, real-time **Supabase PostgreSQL** database sync with Row-Level Security (RLS), and a Node.js API backend for Stripe payments and Resend transactional emails.
+An enterprise-grade food ordering and restaurant management platform customized for Pakistani Hotels & Brands (Pearl Continental Hotel, Kolachi Seaside, Monal Mount View, Cheezious, Student Biryani, Savour Foods, Butt Karahi, Kababjees). Features 3D WebGL visuals, dual **Web + Native Desktop (Electron)** environments, real-time **Supabase PostgreSQL** database sync, PKR pricing, and native Pakistani payment gateways (JazzCash, EasyPaisa, SadaPay, NayaPay, Raast SBP, Cash on Delivery).
 
 ---
 

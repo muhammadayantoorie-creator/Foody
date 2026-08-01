@@ -16,11 +16,11 @@ export default function AIChatAssistantModal({ isOpen, onClose }) {
       id: 1,
       sender: 'ai',
       text: isRTL
-        ? 'سلام! میں فوڈ ڈیش AI اسسٹنٹ ہوں۔ آج آپ کیا کھانا پسند کریں گے؟'
-        : "Hello! I'm FoodDash AI Assistant 🤖. What are you craving today? Tell me your taste, budget, or dietary preference!",
+        ? 'سلام! میں فوڈ ڈیش AI اسسٹنٹ ہوں۔ آج آپ پاکستان کا کون سا پسندیدہ کھانا یا ریسٹورنٹ چننا چاہیں گے؟'
+        : "Hello! I'm FoodDash AI Assistant 🤖. What Pakistani brand or dish are you craving today? Tell me your taste, budget, or favorite hotel!",
       recommendations: [
-        { id: 'f-1', name: 'Double Bacon Smash Burger', price: 14.99, image_url: '/images/burger.png', tag: '🔥 Most Popular' },
-        { id: 'f-3', name: 'Margherita DOC Wood-Fired Pizza', price: 18.00, image_url: '/images/pizza.png', tag: '🌿 Veg Choice' }
+        { id: 'f-1', name: 'Cheezious Crown Crust Pizza', price: 6.50, image_url: '/images/pizza.png', tag: '🔥 #1 Trending' },
+        { id: 'f-2', name: 'Student Biryani Special Platter', price: 2.50, image_url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80', tag: '👑 Legendary Taste' }
       ]
     }
   ]);
@@ -50,33 +50,34 @@ export default function AIChatAssistantModal({ isOpen, onClose }) {
       let recs = [];
       const q = query.toLowerCase();
 
-      if (q.includes('burger') || q.includes('fast food') || q.includes('zing')) {
-        aiResponseText = "Great choice! Here are the highest-rated artisanal burgers crafted with 100% Angus beef & crispy zinger chicken:";
+      if (q.includes('cheez') || q.includes('pizza') || q.includes('crown')) {
+        aiResponseText = "Great choice! Here is Cheezious signature Crown Crust Pizza with molten cheese & tender chicken tikka:";
         recs = [
-          { id: 'f-1', name: 'Double Bacon Smash Burger', price: 14.99, image_url: '/images/burger.png', tag: '⭐ 4.9 Rating' },
-          { id: 'f-2', name: 'Truffle Mushroom Burger', price: 16.50, image_url: '/images/burger.png', tag: '✨ Chef Special' }
+          { id: 'f-1', name: 'Cheezious Crown Crust Pizza', price: 6.50, image_url: '/images/pizza.png', tag: '⭐ 4.9 Rating' },
+          { id: 'f-8', name: 'OPTP Garlic Mayo Gourmet Fries', price: 1.80, image_url: 'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=800&q=80', tag: '✨ Perfect Side' }
         ];
-      } else if (q.includes('pizza') || q.includes('cheese') || q.includes('italian')) {
-        aiResponseText = "Mouth-watering pizzas straight from wood-fired brick ovens:";
+      } else if (q.includes('biryani') || q.includes('pulao') || q.includes('student') || q.includes('savour')) {
+        aiResponseText = "Authentic Pakistani Biryani & Pulao from legendary kitchens:";
         recs = [
-          { id: 'f-3', name: 'Margherita DOC Wood-Fired Pizza', price: 18.00, image_url: '/images/pizza.png', tag: '🧀 Authentic' },
-          { id: 'f-4', name: 'Diavola Pepperoni Pizza', price: 19.50, image_url: '/images/pizza.png', tag: '🌶️ Spicy' }
+          { id: 'f-2', name: 'Student Biryani Special Platter', price: 2.50, image_url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80', tag: '👑 Karachi Style' },
+          { id: 'f-4', name: 'Savour Foods Special Pulao Kabab', price: 2.00, image_url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80', tag: '⚡ Pindi & Islamabad Icon' }
         ];
-      } else if (q.includes('biryani') || q.includes('rice') || q.includes('karahi') || q.includes('desi')) {
-        aiResponseText = "Authentic Pakistani Desi Delights for your hunger:";
+      } else if (q.includes('karahi') || q.includes('butt') || q.includes('monal') || q.includes('desi')) {
+        aiResponseText = "Sizzling organic Desi Ghee Mutton & Chicken Karahi straight from Lakshmi Chowk & Margalla Hills:";
         recs = [
-          { id: 'f-6', name: 'Shahi Special Chicken Biryani (2 Person)', price: 12.99, image_url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80', tag: '👑 Royal Taste' }
+          { id: 'f-3', name: 'Butt Karahi Desi Ghee Mutton Karahi', price: 8.99, image_url: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80', tag: '🔥 Desi Ghee Classic' },
+          { id: 'f-6', name: 'Monal Shinwari Mutton Karahi', price: 9.99, image_url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', tag: '⛰️ Margalla Hilltop Special' }
         ];
-      } else if (q.includes('veg') || q.includes('healthy') || q.includes('salad')) {
-        aiResponseText = "Here are fresh, crisp vegetarian & healthy options:";
+      } else if (q.includes('bbq') || q.includes('kolachi') || q.includes('kababjee') || q.includes('malai')) {
+        aiResponseText = "Melt-in-mouth Pakistani BBQ Malai Boti & charcoal platters:";
         recs = [
-          { id: 'f-7', name: 'Crispy Veggie Spring Rolls (4 pcs)', price: 8.50, image_url: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80', tag: '🥬 100% Veg' }
+          { id: 'f-5', name: 'Kolachi Secret Recipe BBQ Malai Boti', price: 4.50, image_url: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=800&q=80', tag: '🌊 Do Darya Famous' }
         ];
       } else {
-        aiResponseText = `I analyzed your craving for "${query}". Based on live orders in Pakistan tonight, here are top recommendations:`;
+        aiResponseText = `I analyzed your query for "${query}". Based on live top orders across Lahore, Karachi & Islamabad tonight:`;
         recs = [
-          { id: 'f-1', name: 'Double Bacon Smash Burger', price: 14.99, image_url: '/images/burger.png', tag: '🔥 Trending' },
-          { id: 'f-3', name: 'Margherita DOC Wood-Fired Pizza', price: 18.00, image_url: '/images/pizza.png', tag: '⭐ Best Seller' }
+          { id: 'f-1', name: 'Cheezious Crown Crust Pizza', price: 6.50, image_url: '/images/pizza.png', tag: '🔥 #1 Trending' },
+          { id: 'f-3', name: 'Butt Karahi Desi Ghee Mutton Karahi', price: 8.99, image_url: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80', tag: '⭐ Top Seller' }
         ];
       }
 
@@ -106,7 +107,7 @@ export default function AIChatAssistantModal({ isOpen, onClose }) {
                 <h3 style={styles.title}>FoodDash AI Assistant</h3>
                 <span style={styles.aiPill}>PRO AI</span>
               </div>
-              <p style={styles.subtitle}>Smart recommendations & automated food ordering</p>
+              <p style={styles.subtitle}>Smart recommendations for Pakistani hotels & brands</p>
             </div>
           </div>
           <button onClick={onClose} style={styles.closeBtn} title="Close (Esc)">
@@ -116,7 +117,7 @@ export default function AIChatAssistantModal({ isOpen, onClose }) {
 
         {/* Quick Suggestion Chips */}
         <div style={styles.suggestionChips}>
-          {['🍔 Gourmet Burgers', '🍕 Wood-Fired Pizza', '👑 Shahi Biryani', '🥗 Healthy Veg', '⚡ Express 15-min'].map(chip => (
+          {['🍕 Cheezious Crown Crust', '👑 Student Biryani', '🍲 Butt Karahi', '⚡ Savour Pulao', '🌊 Kolachi BBQ'].map(chip => (
             <button
               key={chip}
               onClick={() => handleSendMessage(chip)}

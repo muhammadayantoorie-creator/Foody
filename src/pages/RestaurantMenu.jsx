@@ -29,46 +29,57 @@ export default function RestaurantMenu() {
 
 const MOCK_RESTAURANTS_MAP = {
   'mock-1': {
-    id: 'mock-1', name: 'The Artisan Burger Co.', cuisine: 'American · Gourmet Burgers · Shakes',
-    rating: 4.8, delivery_time: '20-30 min', price_range: '$$$', address: '452 Broadway, New York, NY',
-    image_url: '/images/burger.png',
+    id: 'mock-1', name: 'Pearl Continental (PC) Hotel & Dining', cuisine: 'Pakistani Fine Dining · Royal Mughlai · Luxury Buffet',
+    rating: 4.9, delivery_time: '25-35 min', price_range: '$$$$', address: 'Shahrah-e-Quaid-e-Azam, Mall Road, Lahore',
+    image_url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
   },
   'mock-2': {
-    id: 'mock-2', name: 'Pizza Napoli & Trattoria', cuisine: 'Italian · Wood-Fired Pizza · Pasta',
-    rating: 4.9, delivery_time: '25-35 min', price_range: '$$', address: '128 Mulberry St, New York, NY',
-    image_url: '/images/pizza.png',
+    id: 'mock-2', name: 'Kolachi Seaside Restaurant', cuisine: 'Pakistani BBQ · Seafood Karahi · Do Darya Specials',
+    rating: 4.9, delivery_time: '20-30 min', price_range: '$$$', address: 'Ocean Front, Phase 8, Do Darya, Clifton, Karachi',
+    image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
   },
   'mock-3': {
-    id: 'mock-3', name: 'Sakura Sushi & Omakase Bar', cuisine: 'Japanese · Sushi · Sashimi · Ramen',
-    rating: 4.9, delivery_time: '30-40 min', price_range: '$$$$', address: '789 5th Ave, New York, NY',
-    image_url: '/images/sushi.png',
+    id: 'mock-3', name: 'Monal Mount View Restaurant', cuisine: 'Mughlai BBQ · Chicken Shinwari · Kashmiri Chai',
+    rating: 4.9, delivery_time: '25-35 min', price_range: '$$$', address: 'Pir Sohawa Road, Margalla Hills, Islamabad',
+    image_url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
   },
   'mock-4': {
-    id: 'mock-4', name: 'Taco Fiesta & Cantina', cuisine: 'Mexican · Tacos · Burritos · Margaritas',
-    rating: 4.7, delivery_time: '15-25 min', price_range: '$', address: '321 7th Ave, New York, NY',
-    image_url: '/images/taco.png',
+    id: 'mock-4', name: 'Cheezious Pakistan', cuisine: 'Crown Crust Pizza · Beholder Pizza · Bargarh & Fries',
+    rating: 4.9, delivery_time: '15-25 min', price_range: '$$', address: 'F-7 Markaz, Islamabad & Johar Town, Lahore',
+    image_url: '/images/pizza.png',
   },
   'mock-5': {
-    id: 'mock-5', name: 'Golden Dragon Palace', cuisine: 'Chinese · Dim Sum · Asian Fusion',
-    rating: 4.6, delivery_time: '25-35 min', price_range: '$$', address: '56 Mott St, New York, NY',
-    image_url: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80',
+    id: 'mock-5', name: 'Student Biryani Karachi', cuisine: 'Authentic Karachi Dum Biryani · Zarda · Shami Kabab',
+    rating: 4.8, delivery_time: '15-20 min', price_range: '$', address: 'Saddar & SMCHS, Karachi',
+    image_url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
   },
   'mock-6': {
-    id: 'mock-6', name: 'Taj Mahal Indian Kitchen', cuisine: 'Indian · Curry · Biryani · Tandoori',
-    rating: 4.8, delivery_time: '30-45 min', price_range: '$$', address: '102 Lexington Ave, New York, NY',
+    id: 'mock-6', name: 'Savour Foods Islamabad', cuisine: 'Special Chicken Pulao · Shami Kabab · Zarda',
+    rating: 4.9, delivery_time: '15-25 min', price_range: '$', address: 'Blue Area, Islamabad & Gordon College Rd, Rawalpindi',
     image_url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80',
+  },
+  'mock-7': {
+    id: 'mock-7', name: 'Butt Karahi (Lakshmi Chowk)', cuisine: 'Lahori Desi Ghee Mutton Karahi · Roghani Naan',
+    rating: 4.9, delivery_time: '20-30 min', price_range: '$$$', address: 'Lakshmi Chowk, McLeod Road, Lahore',
+    image_url: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80',
+  },
+  'mock-8': {
+    id: 'mock-8', name: 'Kababjees BBQ & Bakery', cuisine: 'Pakistani BBQ · Malai Boti · Highway Karahi',
+    rating: 4.8, delivery_time: '20-30 min', price_range: '$$', address: 'Superhighway & Clifton, Karachi',
+    image_url: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=800&q=80',
   }
 };
 
 const MOCK_FOOD_ITEMS = [
-  { id: 'f-1', name: 'Double Bacon Smash Burger', category: 'Burgers', price: 14.99, description: 'Two 100% Angus beef patties, smoked bacon, cheddar, secret burger sauce on brioche.', image_url: '/images/burger.png', is_veg: false, is_available: true },
-  { id: 'f-2', name: 'Truffle Mushroom Burger', category: 'Burgers', price: 16.50, description: 'Single smashed patty, wild mushrooms, truffle aioli, swiss cheese, arugula.', image_url: '/images/burger.png', is_veg: false, is_available: true },
-  { id: 'f-3', name: 'Margherita DOC Wood-Fired Pizza', category: 'Pizzas', price: 18.00, description: 'San Marzano tomatoes, fresh buffalo mozzarella, fresh basil, extra virgin olive oil.', image_url: '/images/pizza.png', is_veg: true, is_available: true },
-  { id: 'f-4', name: 'Diavola Pepperoni Pizza', category: 'Pizzas', price: 19.50, description: 'Spicy Calabrian salami, mozzarella, chili oil, San Marzano tomato base.', image_url: '/images/pizza.png', is_veg: false, is_available: true },
-  { id: 'f-5', name: 'Dragon Roll & Spicy Tuna', category: 'Sushi & Rolls', price: 21.00, description: 'Eel, cucumber wrapped in avocado, spicy tuna, unagi sauce, tobiko.', image_url: '/images/sushi.png', is_veg: false, is_available: true },
-  { id: 'f-6', name: 'Carnitas & Birria Tacos (3 pcs)', category: 'Tacos', price: 13.99, description: 'Slow-cooked braised pork & birria beef tacos with consommé dip, cilantro, lime.', image_url: '/images/taco.png', is_veg: false, is_available: true },
-  { id: 'f-7', name: 'Crispy Veggie Spring Rolls (4 pcs)', category: 'Sides & Starters', price: 8.50, description: 'Handmade crispy vegetable spring rolls served with sweet chili dip.', image_url: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80', is_veg: true, is_available: true },
-  { id: 'f-8', name: 'Craft Mango Lassi & Milkshakes', category: 'Beverages', price: 5.99, description: 'Fresh Alphonso mango yogurt lassi or thick vanilla bean milkshake.', image_url: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=800&q=80', is_veg: true, is_available: true },
+  { id: 'f-1', name: 'Cheezious Crown Crust Pizza', category: 'Crown Crust & Pizza', price: 6.50, description: 'Cheezious signature crown crust filled with molten cheese, chicken tikka, ranch sauce & fresh veggies.', image_url: '/images/pizza.png', is_veg: false, is_available: true },
+  { id: 'f-2', name: 'Student Biryani Special Chicken Platter', category: 'Biryani & Pulao', price: 2.50, description: 'Authentic spicy Karachi Dum Biryani served with fresh salad, raita, and shami kabab.', image_url: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80', is_veg: false, is_available: true },
+  { id: 'f-3', name: 'Butt Karahi Desi Ghee Mutton Karahi', category: 'Desi Karahi & Handi', price: 8.99, description: 'Iconic Lahori Lakshmi Chowk fresh mutton cooked in pure organic Desi Ghee, ginger, and green chilies.', image_url: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80', is_veg: false, is_available: true },
+  { id: 'f-4', name: 'Savour Foods Special Pulao Kabab', category: 'Biryani & Pulao', price: 2.00, description: 'Piping hot fragrant chicken pulao served with 2 crispy beef shami kababs, fresh salad & raita.', image_url: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=800&q=80', is_veg: false, is_available: true },
+  { id: 'f-5', name: 'Kolachi Secret Recipe BBQ Malai Boti', category: 'Pakistani BBQ', price: 4.50, description: 'Melt-in-mouth tender chicken malai boti grilled over charcoal, served with mint chutney & roghani naan.', image_url: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=800&q=80', is_veg: false, is_available: true },
+  { id: 'f-6', name: 'Monal Shinwari Mutton Karahi', category: 'Desi Karahi & Handi', price: 9.99, description: 'Traditional Margalla hilltop Shinwari style mutton cooked only with salt, tomatoes & green chilies.', image_url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', is_veg: false, is_available: true },
+  { id: 'f-7', name: 'Javed Special Nalli Nihari', category: 'Nihari & Sweets', price: 4.20, description: 'Slow-cooked Karachi beef shank nihari loaded with extra marrow (nalli), served with warm sheermal.', image_url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80', is_veg: false, is_available: true },
+  { id: 'f-8', name: 'OPTP Garlic Mayo Gourmet Fries', category: 'Burgers & Fries', price: 1.80, description: 'Fresh Belgian cut crisp potatoes loaded with signature OPTP garlic mayo & cheddar sauce.', image_url: 'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=800&q=80', is_veg: true, is_available: true },
+  { id: 'f-9', name: 'Shahi Royal Kheer & Kashmiri Chai', category: 'Beverages & Desserts', price: 1.25, description: 'Rich pistachio cardamom zafrani kheer paired with traditional pink Kashmiri Doodh Patti chai.', image_url: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=800&q=80', is_veg: true, is_available: true },
 ];
 
   const fetchRestaurantAndMenu = async () => {
